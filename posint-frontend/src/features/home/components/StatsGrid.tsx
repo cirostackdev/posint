@@ -40,14 +40,14 @@ export function StatsGrid() {
     },
     {
       label: "Constituency Projects",
-      value: "2,156",
+      value: statsData ? formatCompactNumber(statsData.constituencyProjects) : "0",
       icon: Building,
       change: "₦4.2T allocated",
       trend: "up" as const,
     },
     {
       label: "Party Defections",
-      value: "23",
+      value: statsData ? String(statsData.partyDefections) : "0",
       icon: ArrowLeftRight,
       change: "Since 2023 elections",
       trend: "neutral" as const,

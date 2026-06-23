@@ -4,6 +4,8 @@ import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 import { Card } from "@/shared/components/ui/card"
 import { Button } from "@/shared/components/ui/button"
+import { Skeleton } from "@/shared/components/ui/skeleton"
+import { useParties } from "@/features/parties/hooks/use-parties"
 
 const partyColors: Record<string, string> = {
   APC: "bg-status-info",
@@ -11,22 +13,36 @@ const partyColors: Record<string, string> = {
   LP: "bg-status-success",
   NNPP: "bg-status-warning",
   APGA: "bg-purple-500",
-  Others: "bg-muted-foreground",
 }
 
-const partyStats = [
-  { abbreviation: "APC", seats: 256, governors: 22 },
-  { abbreviation: "PDP", seats: 158, governors: 13 },
-  { abbreviation: "LP", seats: 35, governors: 1 },
-  { abbreviation: "NNPP", seats: 19, governors: 1 },
-  { abbreviation: "APGA", seats: 8, governors: 0 },
-  { abbreviation: "Others", seats: 14, governors: 0 },
-]
-
-const totalSeats = partyStats.reduce((acc, p) => acc + p.seats, 0)
-const totalGovernors = partyStats.reduce((acc, p) => acc + p.governors, 0)
+function getColorClass(abbreviation: string, color: string): string {
+  if (partyColors[abbreviation]) return partyColors[abbreviation]
+  return "bg-muted-foreground"
+}
 
 export function PartyBreakdown() {
+  const { data: parties, isLoading } = useParties()
+
+  const totalSeats = parties?.reduce((acc, p) => acc + p.seatsTotal, 0) ?? 0
+  const totalGovernors = parties?.reduce((acc, p) => acc + p.governors, 0) ?? 0
+
+  if (isLoading) {
+    return (
+      <section className="py-12 md:py-16">
+        <div className="container px-4">
+          <div className="grid lg:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-24 w-full" />)}
+            </div>
+            <Skeleton className="h-80 w-full" />
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  const partyStats = parties ?? []
+
   return (
     <section className="py-12 md:py-16">
       <div className="container px-4">
@@ -51,10 +67,10 @@ export function PartyBreakdown() {
           {/* Left: Party Stats */}
           <div className="space-y-4">
             {partyStats.map((party) => {
-              const percentage = (party.seats / totalSeats) * 100
-              const colorClass = partyColors[party.abbreviation] || "bg-muted-foreground"
+              const percentage = totalSeats > 0 ? (party.seatsTotal / totalSeats) * 100 : 0
+              const colorClass = getColorClass(party.abbreviation, party.color)
               return (
-                <Link key={party.abbreviation} href={`/parties/${party.abbreviation.toLowerCase()}`}>
+                <Link key={party.abbreviation} href={`/parties/${party.slug}`}>
                   <Card className="p-4 border-border/50 hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
@@ -62,7 +78,7 @@ export function PartyBreakdown() {
                         <span className="font-semibold text-foreground">{party.abbreviation}</span>
                       </div>
                       <div className="text-right">
-                        <span className="font-display font-bold text-foreground">{party.seats}</span>
+                        <span className="font-display font-bold text-foreground">{party.seatsTotal}</span>
                         <span className="text-muted-foreground text-sm ml-2">
                           ({percentage.toFixed(1)}%)
                         </span>
@@ -93,14 +109,14 @@ export function PartyBreakdown() {
             {/* Stacked Bar */}
             <div className="h-12 rounded-lg overflow-hidden flex mb-6">
               {partyStats.map((party) => {
-                const percentage = (party.seats / totalSeats) * 100
-                const colorClass = partyColors[party.abbreviation] || "bg-muted-foreground"
+                const percentage = totalSeats > 0 ? (party.seatsTotal / totalSeats) * 100 : 0
+                const colorClass = getColorClass(party.abbreviation, party.color)
                 return (
                   <div
                     key={party.abbreviation}
                     className={`${colorClass} transition-all duration-500 hover:opacity-80`}
                     style={{ width: `${percentage}%` }}
-                    title={`${party.abbreviation}: ${party.seats} seats`}
+                    title={`${party.abbreviation}: ${party.seatsTotal} seats`}
                   />
                 )
               })}
@@ -110,7 +126,7 @@ export function PartyBreakdown() {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {partyStats.map((party) => (
                 <div key={party.abbreviation} className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-sm ${partyColors[party.abbreviation] || "bg-muted-foreground"}`} />
+                  <div className={`w-3 h-3 rounded-sm ${getColorClass(party.abbreviation, party.color)}`} />
                   <span className="text-sm text-muted-foreground">{party.abbreviation}</span>
                 </div>
               ))}
@@ -128,7 +144,7 @@ export function PartyBreakdown() {
                   <p className="text-xs text-muted-foreground uppercase tracking-wider">Governors</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-display font-bold text-foreground">{partyStats.filter(p => p.seats > 0).length}</p>
+                  <p className="text-2xl font-display font-bold text-foreground">{partyStats.filter(p => p.seatsTotal > 0).length}</p>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider">Parties</p>
                 </div>
               </div>

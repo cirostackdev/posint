@@ -26,6 +26,7 @@ import {
   usePoliticianDefections,
   usePoliticianCareer,
   usePoliticianCommittees,
+  usePoliticianSocial,
 } from "../hooks/use-politicians"
 
 interface PoliticianProfilePageProps {
@@ -41,6 +42,7 @@ export function PoliticianProfilePage({ slug }: PoliticianProfilePageProps) {
   const { data: defections = [] } = usePoliticianDefections(slug)
   const { data: career = [] } = usePoliticianCareer(slug)
   const { data: committees = [] } = usePoliticianCommittees(slug)
+  const { data: socialData, isLoading: socialLoading } = usePoliticianSocial(slug)
 
   if (isLoading) {
     return (
@@ -325,13 +327,85 @@ export function PoliticianProfilePage({ slug }: PoliticianProfilePageProps) {
 
             {/* Social & Sentiment Tab */}
             <TabsContent value="social">
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <p className="text-muted-foreground">
-                    Social media data and public sentiment analysis are not yet available for this politician.
-                  </p>
-                </CardContent>
-              </Card>
+              {socialLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-32 w-full" />
+                  <Skeleton className="h-32 w-full" />
+                  <Skeleton className="h-32 w-full" />
+                </div>
+              ) : !socialData || (!socialData.posts?.length && !socialData.stats) ? (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <p className="text-muted-foreground">
+                      No social media data available for this politician.
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-6">
+                  {socialData.stats && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Public Sentiment</CardTitle>
+                      </CardHeader>
+                      <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {socialData.stats.overallSentiment !== undefined && (
+                          <div className="text-center">
+                            <p className="text-2xl font-bold text-foreground">{socialData.stats.overallSentiment}%</p>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider">Overall Sentiment</p>
+                          </div>
+                        )}
+                        {socialData.stats.positiveCount !== undefined && (
+                          <div className="text-center">
+                            <p className="text-2xl font-bold text-status-success">{socialData.stats.positiveCount}</p>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider">Positive</p>
+                          </div>
+                        )}
+                        {socialData.stats.negativeCount !== undefined && (
+                          <div className="text-center">
+                            <p className="text-2xl font-bold text-status-danger">{socialData.stats.negativeCount}</p>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider">Negative</p>
+                          </div>
+                        )}
+                        {socialData.stats.totalMentions !== undefined && (
+                          <div className="text-center">
+                            <p className="text-2xl font-bold text-foreground">{socialData.stats.totalMentions}</p>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Mentions</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+                  {socialData.posts?.length > 0 && (
+                    <div className="space-y-3">
+                      {socialData.posts.map((post: any, i: number) => (
+                        <Card key={post.id ?? i}>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <p className="text-sm text-foreground flex-1">{post.content ?? post.text}</p>
+                              <div className="text-right shrink-0">
+                                {post.platform && (
+                                  <Badge variant="secondary" className="text-xs">{post.platform}</Badge>
+                                )}
+                                {post.sentimentScore !== undefined && (
+                                  <p className={`text-xs mt-1 ${post.sentimentScore > 0 ? "text-status-success" : post.sentimentScore < 0 ? "text-status-danger" : "text-muted-foreground"}`}>
+                                    {post.sentimentScore > 0 ? "Positive" : post.sentimentScore < 0 ? "Negative" : "Neutral"}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            {post.publishedAt && (
+                              <p className="text-xs text-muted-foreground mt-2">
+                                {new Date(post.publishedAt).toLocaleDateString()}
+                              </p>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>

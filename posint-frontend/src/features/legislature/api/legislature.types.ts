@@ -27,6 +27,7 @@ export interface LegislatureStats {
   passed: number
   rejected: number
   pending: number
+  byMonth?: Array<{ month: string; bills: number; passed: number; rejected: number }>
 }
 
 export interface BillListResponse {

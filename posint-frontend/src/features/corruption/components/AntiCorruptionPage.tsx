@@ -15,15 +15,6 @@ const CorruptionChart = dynamic(
   { ssr: false, loading: () => <Skeleton className="h-[320px] w-full rounded-lg" /> }
 )
 
-const corruptionByYear = [
-  { year: 2018, cases: 45, convictions: 8, amountRecovered: 2.5 },
-  { year: 2019, cases: 52, convictions: 12, amountRecovered: 4.2 },
-  { year: 2020, cases: 38, convictions: 6, amountRecovered: 1.8 },
-  { year: 2021, cases: 61, convictions: 15, amountRecovered: 5.6 },
-  { year: 2022, cases: 73, convictions: 18, amountRecovered: 8.3 },
-  { year: 2023, cases: 87, convictions: 22, amountRecovered: 12.1 },
-]
-
 const YEARS = Array.from({ length: 8 }, (_, i) => String(2023 - i))
 
 export function AntiCorruptionPage() {
@@ -33,9 +24,12 @@ export function AntiCorruptionPage() {
 
   const activeFilters = { agency: agency ?? null, status: status ?? null, year: year ? String(year) : null }
 
-  const totalRecovered = corruptionByYear.reduce((sum, d) => sum + d.amountRecovered, 0)
-  const totalConvictions = corruptionByYear.reduce((sum, d) => sum + d.convictions, 0)
-  const totalCases = corruptionByYear.reduce((sum, d) => sum + d.cases, 0)
+  const recoveredKobo = BigInt(stats?.totalRecoveredKobo ?? '0')
+  // NGN = kobo / 100 — do the division in BigInt to avoid float imprecision
+  const recoveredNgn = recoveredKobo / 100n
+  const recoveredDisplay = recoveredNgn >= 1_000_000_000n
+    ? `₦${(Number(recoveredNgn) / 1_000_000_000).toFixed(1)}B`
+    : `₦${(Number(recoveredNgn) / 1_000_000).toFixed(0)}M`
 
   return (
     <PageShell
@@ -52,7 +46,7 @@ export function AntiCorruptionPage() {
           <Card className="border-border/50">
             <CardContent className="p-4 text-center">
               <p className="text-3xl font-display font-bold text-status-warning">
-                {stats?.total ?? totalCases}
+                {stats?.total ?? "—"}
               </p>
               <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Cases</p>
             </CardContent>
@@ -60,7 +54,7 @@ export function AntiCorruptionPage() {
           <Card className="border-border/50">
             <CardContent className="p-4 text-center">
               <p className="text-3xl font-display font-bold text-status-danger">
-                {stats?.convictions ?? totalConvictions}
+                {stats?.convictions ?? "—"}
               </p>
               <p className="text-xs text-muted-foreground uppercase tracking-wider">Convictions</p>
             </CardContent>
@@ -68,7 +62,7 @@ export function AntiCorruptionPage() {
           <Card className="border-border/50">
             <CardContent className="p-4 text-center">
               <p className="text-3xl font-display font-bold text-status-success">
-                ₦{totalRecovered.toFixed(1)}B
+                {stats ? recoveredDisplay : "—"}
               </p>
               <p className="text-xs text-muted-foreground uppercase tracking-wider">Recovered</p>
             </CardContent>
@@ -84,7 +78,7 @@ export function AntiCorruptionPage() {
         </div>
 
         {/* Charts */}
-        <CorruptionChart />
+        <CorruptionChart byYear={stats?.byYear ?? []} byAgency={stats?.byAgency ?? []} />
 
         {/* Filters */}
         <SearchFilter

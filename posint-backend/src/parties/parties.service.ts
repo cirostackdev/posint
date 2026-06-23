@@ -24,10 +24,29 @@ export class PartiesService {
   async findBySlug(slug: string) {
     const party = await this.prisma.politicalParty.findUnique({
       where: { slug },
-      include: { politicians: { where: { isActive: true }, select: { id: true, slug: true, name: true, position: true, chamber: true, state: true, photoUrl: true }, orderBy: { name: 'asc' } } },
+      include: {
+        politicians: {
+          where: { isActive: true },
+          select: { id: true, slug: true, name: true, position: true, chamber: true, state: true, photoUrl: true, billsSponsored: true, attendanceRate: true },
+          orderBy: { name: 'asc' },
+        },
+      },
     })
     if (!party) throw new NotFoundException('Party not found')
-    return party
+
+    const members = party.politicians
+    const avgAttendance = members.length
+      ? Math.round(members.reduce((sum, p) => sum + Number(p.attendanceRate), 0) / members.length * 10) / 10
+      : 0
+    const totalBills = members.reduce((sum, p) => sum + p.billsSponsored, 0)
+
+    const [corruptionCases, defectionsIn, defectionsOut] = await Promise.all([
+      this.prisma.corruptionCase.count({ where: { isActive: true, politician: { partyId: party.id } } }),
+      this.prisma.partyDefection.count({ where: { toPartyId: party.id } }),
+      this.prisma.partyDefection.count({ where: { fromPartyId: party.id } }),
+    ])
+
+    return { ...party, avgAttendance, totalBills, corruptionCases, defectionsIn, defectionsOut }
   }
 
   async create(dto: CreatePartyDto, adminUserId: string) {

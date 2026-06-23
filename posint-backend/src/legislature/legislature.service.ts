@@ -36,13 +36,32 @@ export class LegislatureService {
 
   async getBillStats() {
     return this.redis.getOrSet('legislature:stats', async () => {
-      const [total, passed, rejected, pending] = await Promise.all([
+      const now = new Date()
+      const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1)
+      const [total, passed, rejected, pending, monthlyRaw] = await Promise.all([
         this.prisma.sponsoredBill.count(),
         this.prisma.sponsoredBill.count({ where: { status: 'PASSED' } }),
         this.prisma.sponsoredBill.count({ where: { status: 'REJECTED' } }),
         this.prisma.sponsoredBill.count({ where: { status: { in: ['FIRST_READING','SECOND_READING','THIRD_READING'] } } }),
+        this.prisma.$queryRaw<Array<{ month: string; bills: bigint; passed: bigint; rejected: bigint }>>`
+          SELECT
+            TO_CHAR(date_introduced, 'Mon') AS month,
+            COUNT(*) AS bills,
+            COUNT(*) FILTER (WHERE status = 'PASSED') AS passed,
+            COUNT(*) FILTER (WHERE status = 'REJECTED') AS rejected
+          FROM sponsored_bills
+          WHERE date_introduced >= ${twelveMonthsAgo}
+          GROUP BY DATE_TRUNC('month', date_introduced), TO_CHAR(date_introduced, 'Mon')
+          ORDER BY DATE_TRUNC('month', date_introduced) ASC
+        `,
       ])
-      return { total, passed, rejected, pending }
+      const byMonth = monthlyRaw.map(r => ({
+        month: r.month,
+        bills: Number(r.bills),
+        passed: Number(r.passed),
+        rejected: Number(r.rejected),
+      }))
+      return { total, passed, rejected, pending, byMonth }
     }, 900)
   }
 

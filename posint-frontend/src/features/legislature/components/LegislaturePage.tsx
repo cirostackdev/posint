@@ -64,7 +64,7 @@ export function LegislaturePage() {
 
           {/* Chart */}
           <div className="mb-8">
-            <LegislativeChart />
+            <LegislativeChart data={stats?.byMonth} />
           </div>
 
           {/* Filters */}

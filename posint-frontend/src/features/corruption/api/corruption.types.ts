@@ -22,6 +22,8 @@ export interface CorruptionStats {
   acquittals: number
   active: number
   totalRecoveredKobo: string
+  byYear: Array<{ year: number; cases: number; convictions: number }>
+  byAgency: Array<{ agency: string; cases: number; convictions: number }>
 }
 
 export interface CaseListResponse {

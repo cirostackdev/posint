@@ -12,7 +12,8 @@ export class AdminService {
     const cached = await this.redis.get<any>('stats:platform')
     if (cached) return cached
 
-    const [politicians, parties, elections, bills, billsPassed, cases, activeCases, recovered] = await Promise.all([
+    const [politicians, parties, elections, bills, billsPassed, cases, activeCases, recovered,
+           constituencyProjects, partyDefections, lastSource] = await Promise.all([
       this.prisma.politician.count({ where: { isActive: true } }),
       this.prisma.politicalParty.count({ where: { isActive: true } }),
       this.prisma.election.count(),
@@ -21,8 +22,22 @@ export class AdminService {
       this.prisma.corruptionCase.count({ where: { isActive: true } }),
       this.prisma.corruptionCase.count({ where: { isActive: true, status: { in: ['UNDER_INVESTIGATION','ONGOING'] } } }),
       this.prisma.corruptionCase.aggregate({ _sum: { amountRecoveredKobo: true } }),
+      this.prisma.constituencyProject.count(),
+      this.prisma.partyDefection.count(),
+      this.prisma.dataSource.findFirst({
+        where: { lastSuccessAt: { not: null } },
+        orderBy: { lastSuccessAt: 'desc' },
+        select: { lastSuccessAt: true },
+      }),
     ])
-    return { politicians, parties, elections, bills, billsPassed, cases, activeCases, totalRecoveredKobo: recovered._sum.amountRecoveredKobo?.toString() ?? '0' }
+    return {
+      politicians, parties, elections, bills, billsPassed, cases, activeCases,
+      totalRecoveredKobo: recovered._sum.amountRecoveredKobo?.toString() ?? '0',
+      constituencyProjects,
+      partyDefections,
+      activePipelineJobs: 0,
+      lastSyncAt: lastSource?.lastSuccessAt?.toISOString() ?? null,
+    }
   }
 
   async getUsers(query: AdminQueryDto) {

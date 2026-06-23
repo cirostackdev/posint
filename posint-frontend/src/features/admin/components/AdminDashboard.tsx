@@ -141,10 +141,10 @@ export function AdminDashboard() {
           Platform Stats
         </h3>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          <StatCard label="Politicians" value={stats?.totalPoliticians} isLoading={isLoading} />
-          <StatCard label="Elections" value={stats?.totalElections} isLoading={isLoading} />
-          <StatCard label="Bills" value={stats?.totalBills} isLoading={isLoading} />
-          <StatCard label="Cases" value={stats?.totalCases} isLoading={isLoading} />
+          <StatCard label="Politicians" value={stats?.politicians} isLoading={isLoading} />
+          <StatCard label="Elections" value={stats?.elections} isLoading={isLoading} />
+          <StatCard label="Bills" value={stats?.bills} isLoading={isLoading} />
+          <StatCard label="Cases" value={stats?.cases} isLoading={isLoading} />
           <StatCard label="Active Jobs" value={stats?.activePipelineJobs} isLoading={isLoading} />
           <StatCard
             label="Last Sync"

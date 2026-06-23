@@ -1,8 +1,19 @@
+"use client"
+
 import Link from "next/link"
 import { ArrowRight, Database, Scale, FileSearch, Shield } from "lucide-react"
 import { Button } from "@/shared/components/ui/button"
+import { usePlatformStats } from "../hooks/use-home"
 
 export function HeroSection() {
+  const { data: stats } = usePlatformStats()
+
+  const pills = [
+    { icon: Database, label: stats ? `${stats.politicians}+ Politicians` : "Politicians Tracked" },
+    { icon: FileSearch, label: stats ? `${stats.bills} Active Bills` : "Bills Monitored" },
+    { icon: Scale, label: stats ? `${stats.cases} Corruption Cases` : "Corruption Cases" },
+  ]
+
   return (
     <section className="relative overflow-hidden gradient-hero">
       {/* Background Pattern */}
@@ -55,11 +66,7 @@ export function HeroSection() {
 
           {/* Feature Pills */}
           <div className="flex flex-wrap items-center justify-center gap-4 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-            {[
-              { icon: Database, label: '1,469+ Politicians' },
-              { icon: FileSearch, label: '342 Active Bills' },
-              { icon: Scale, label: '87 Corruption Cases' },
-            ].map((item) => (
+            {pills.map((item) => (
               <div
                 key={item.label}
                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10"

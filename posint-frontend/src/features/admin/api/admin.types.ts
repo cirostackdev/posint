@@ -1,8 +1,14 @@
 export interface AdminStats {
-  totalPoliticians: number
-  totalElections: number
-  totalBills: number
-  totalCases: number
+  politicians: number
+  parties: number
+  elections: number
+  bills: number
+  billsPassed: number
+  cases: number
+  activeCases: number
+  totalRecoveredKobo: string
+  constituencyProjects: number
+  partyDefections: number
   activePipelineJobs: number
   lastSyncAt: string | null
 }

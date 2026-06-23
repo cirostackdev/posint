@@ -3,21 +3,27 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
 
-const corruptionByYear = [
-  { year: 2018, cases: 45, convictions: 8, amountRecovered: 2.5 },
-  { year: 2019, cases: 52, convictions: 12, amountRecovered: 4.2 },
-  { year: 2020, cases: 38, convictions: 6, amountRecovered: 1.8 },
-  { year: 2021, cases: 61, convictions: 15, amountRecovered: 5.6 },
-  { year: 2022, cases: 73, convictions: 18, amountRecovered: 8.3 },
-  { year: 2023, cases: 87, convictions: 22, amountRecovered: 12.1 },
-]
+interface ByYearEntry {
+  year: number
+  cases: number
+  convictions: number
+}
 
-const corruptionByAgency = [
-  { name: "EFCC", cases: 234, convictions: 67 },
-  { name: "ICPC", cases: 156, convictions: 34 },
-]
+interface ByAgencyEntry {
+  agency: string
+  cases: number
+  convictions: number
+}
 
-export function CorruptionChart() {
+interface CorruptionChartProps {
+  byYear?: ByYearEntry[]
+  byAgency?: ByAgencyEntry[]
+}
+
+export function CorruptionChart({ byYear = [], byAgency = [] }: CorruptionChartProps) {
+  const yearData = [...byYear].reverse()
+  const agencyData = byAgency.map(a => ({ name: a.agency, cases: a.cases, convictions: a.convictions }))
+
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <Card className="border-border/50">
@@ -26,7 +32,7 @@ export function CorruptionChart() {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={corruptionByYear}>
+            <AreaChart data={yearData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="year" stroke="hsl(var(--muted-foreground))" />
               <YAxis stroke="hsl(var(--muted-foreground))" />
@@ -65,7 +71,7 @@ export function CorruptionChart() {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={corruptionByAgency}>
+            <BarChart data={agencyData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
               <YAxis stroke="hsl(var(--muted-foreground))" />

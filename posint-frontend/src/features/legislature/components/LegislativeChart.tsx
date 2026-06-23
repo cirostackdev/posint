@@ -14,16 +14,19 @@ interface LegislativeChartProps {
   data?: ChartData[]
 }
 
-const DEFAULT_DATA: ChartData[] = [
-  { month: "Jan", bills: 12, passed: 5, rejected: 2 },
-  { month: "Feb", bills: 18, passed: 8, rejected: 3 },
-  { month: "Mar", bills: 15, passed: 6, rejected: 4 },
-  { month: "Apr", bills: 22, passed: 10, rejected: 5 },
-  { month: "May", bills: 19, passed: 9, rejected: 3 },
-  { month: "Jun", bills: 25, passed: 12, rejected: 6 },
-]
-
-export function LegislativeChart({ data = DEFAULT_DATA }: LegislativeChartProps) {
+export function LegislativeChart({ data }: LegislativeChartProps) {
+  if (!data || data.length === 0) {
+    return (
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="text-lg">Legislative Activity Trend</CardTitle>
+        </CardHeader>
+        <CardContent className="py-12 text-center">
+          <p className="text-muted-foreground text-sm">No bill data available for the past 12 months.</p>
+        </CardContent>
+      </Card>
+    )
+  }
   return (
     <Card className="border-border/50">
       <CardHeader>

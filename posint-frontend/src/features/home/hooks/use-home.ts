@@ -13,6 +13,8 @@ export function usePlatformStats() {
       cases: number
       activeCases: number
       totalRecoveredKobo: string
+      constituencyProjects: number
+      partyDefections: number
     }>("/admin/stats"),
     staleTime: 1000 * 60 * 15,
   })
