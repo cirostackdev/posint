@@ -4,12 +4,12 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "512",
   "memory": "1024",
-  "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskRole",
+  "executionRoleArn": "arn:aws:iam::165115313935:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::165115313935:role/posintTaskRole",
   "containerDefinitions": [
     {
       "name": "posint-backend",
-      "image": "ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/posint-backend:latest",
+      "image": "165115313935.dkr.ecr.us-east-1.amazonaws.com/posint-backend:latest",
       "portMappings": [
         {
           "containerPort": 4000,
@@ -24,74 +24,70 @@
       "secrets": [
         {
           "name": "DATABASE_URL",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:DATABASE_URL::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:DATABASE_URL::"
         },
         {
           "name": "DIRECT_DATABASE_URL",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:DIRECT_DATABASE_URL::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:DIRECT_DATABASE_URL::"
         },
         {
           "name": "JWT_ACCESS_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:JWT_ACCESS_SECRET::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:JWT_ACCESS_SECRET::"
         },
         {
           "name": "JWT_REFRESH_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:JWT_REFRESH_SECRET::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:JWT_REFRESH_SECRET::"
         },
         {
           "name": "UPSTASH_REDIS_REST_URL",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:UPSTASH_REDIS_REST_URL::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:UPSTASH_REDIS_REST_URL::"
         },
         {
           "name": "UPSTASH_REDIS_REST_TOKEN",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:UPSTASH_REDIS_REST_TOKEN::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:UPSTASH_REDIS_REST_TOKEN::"
         },
         {
           "name": "REDIS_HOST",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:REDIS_HOST::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:REDIS_HOST::"
         },
         {
           "name": "REDIS_PORT",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:REDIS_PORT::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:REDIS_PORT::"
         },
         {
           "name": "REDIS_PASSWORD",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:REDIS_PASSWORD::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:REDIS_PASSWORD::"
         },
         {
           "name": "PUSHER_APP_ID",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:PUSHER_APP_ID::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:PUSHER_APP_ID::"
         },
         {
           "name": "NEXT_PUBLIC_PUSHER_KEY",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:NEXT_PUBLIC_PUSHER_KEY::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:NEXT_PUBLIC_PUSHER_KEY::"
         },
         {
           "name": "PUSHER_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:PUSHER_SECRET::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:PUSHER_SECRET::"
         },
         {
           "name": "PUSHER_CLUSTER",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:PUSHER_CLUSTER::"
-        },
-        {
-          "name": "OPENAI_API_KEY",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:OPENAI_API_KEY::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:PUSHER_CLUSTER::"
         },
         {
           "name": "TWITTER_BEARER_TOKEN",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:TWITTER_BEARER_TOKEN::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:TWITTER_BEARER_TOKEN::"
         },
         {
           "name": "FRONTEND_URL",
-          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:posint/backend:FRONTEND_URL::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:165115313935:secret:posint/backend-L7g63Y:FRONTEND_URL::"
         }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/posint-backend",
-          "awslogs-region": "REGION",
+          "awslogs-group": "ecs-posint-backend",
+          "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }
       },

@@ -70,18 +70,6 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Run database migrations
-        env:
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          aws ecs run-task \
-            --cluster $ECS_CLUSTER \
-            --task-definition posint-migrate \
-            --launch-type FARGATE \
-            --network-configuration "awsvpcConfiguration={subnets=[${{ secrets.ECS_SUBNET }}],securityGroups=[${{ secrets.ECS_SECURITY_GROUP }}],assignPublicIp=ENABLED}" \
-            --overrides '{"containerOverrides":[{"name":"posint-migrate","command":["npx","prisma","migrate","deploy"]}]}' \
-            --wait-for-completion
-
       - name: Update ECS task definition with new image
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
