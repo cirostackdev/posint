@@ -1102,7 +1102,7 @@ async function main() {
 
   // ── 19. Chukwuemeka Nwajiuba ────────────────────────────────
   const nwajiuba = await prisma.politician.upsert({
-    where: { slug: 'chukwuemeka-nwajiuba' }, update: {},
+    where: { slug: 'chukwuemeka-nwajiuba' }, update: { isActive: true },
     create: {
       slug: 'chukwuemeka-nwajiuba', name: 'Chukwuemeka Nwajiuba', partyId: apc.id,
       position: 'Former Minister of State for Education', chamber: null,
@@ -1111,7 +1111,7 @@ async function main() {
       education: 'BSc Computer Science, Imo State University; MSc, Abia State University',
       biography: 'Chukwuemeka Nwajiuba is a former member of the House of Representatives representing Isiala Mbano/Onuimo/Okigwe (2015–2019) and was appointed Minister of State for Education under President Buhari from 2019 to 2023. He surprised the political class in 2023 when he declared a presidential bid, but withdrew later. During his ministerial tenure he was involved in the Student Loan Act framework and ASUU negotiations.',
       firstElected: 2015, currentTermStart: null, yearsInOffice: 8,
-      billsSponsored: 15, attendanceRate: 83.4, isActive: false,
+      billsSponsored: 15, attendanceRate: 83.4, isActive: true,
       photoUrl: 'https://assets.posint.ng/politicians/chukwuemeka-nwajiuba.jpg',
       sourceUrl: 'https://education.gov.ng/minister-of-state',
     },
