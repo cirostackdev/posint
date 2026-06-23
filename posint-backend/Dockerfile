@@ -7,6 +7,7 @@ RUN npm ci
 COPY . .
 RUN npx prisma generate
 RUN npm run build
+RUN ls dist/main.js || (echo "ERROR: dist/main.js not found after build" && exit 1)
 
 # Production image
 FROM node:22-alpine AS production
