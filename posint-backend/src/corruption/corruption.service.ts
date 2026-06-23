@@ -12,6 +12,14 @@ import { toJsonSafe } from '../common/utils/json.util'
 export class CorruptionService {
   constructor(private prisma: PrismaService, private redis: RedisService, private pusher: PusherService) {}
 
+  private serializeCase(c: any) {
+    return {
+      ...c,
+      amountInvolvedKobo: c.amountInvolvedKobo != null ? c.amountInvolvedKobo.toString() : null,
+      amountRecoveredKobo: c.amountRecoveredKobo != null ? c.amountRecoveredKobo.toString() : '0',
+    }
+  }
+
   async findAll(query: QueryCasesDto) {
     const cacheKey = `corruption:list:${JSON.stringify(query)}`
     return this.redis.getOrSet(cacheKey, async () => {
@@ -26,14 +34,14 @@ export class CorruptionService {
         this.prisma.corruptionCase.findMany({ where, skip: query.skip, take: query.limit, orderBy: { filingDate: 'desc' }, include: { politician: { select: { name: true, slug: true } } } }),
         this.prisma.corruptionCase.count({ where }),
       ])
-      return { data: items, meta: { page: query.page, limit: query.limit, total, totalPages: Math.ceil(total / query.limit) } }
+      return { data: items.map(c => this.serializeCase(c)), meta: { page: query.page, limit: query.limit, total, totalPages: Math.ceil(total / query.limit) } }
     }, 300)
   }
 
   async findById(id: string) {
     const case_ = await this.prisma.corruptionCase.findFirst({ where: { id, isActive: true }, include: { politician: true } })
     if (!case_) throw new NotFoundException('Case not found')
-    return case_
+    return this.serializeCase(case_)
   }
 
   async getStats() {
