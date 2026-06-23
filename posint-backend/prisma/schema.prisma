@@ -1,0 +1,576 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+// ══════════════════════════════════════════════════════════════
+// AUTH & USERS
+// ══════════════════════════════════════════════════════════════
+
+enum UserRole {
+  USER
+  EDITOR
+  ADMIN
+}
+
+model User {
+  id             String    @id @default(uuid()) @db.Uuid
+  email          String    @unique
+  passwordHash   String    @map("password_hash")
+  displayName    String?   @map("display_name")
+  role           UserRole  @default(USER)
+  avatarUrl      String?   @map("avatar_url")
+  isActive       Boolean   @default(true) @map("is_active")
+  refreshToken   String?   @map("refresh_token")
+  lastLoginAt    DateTime? @map("last_login_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  watchlist UserWatchlist[]
+
+  @@map("users")
+}
+
+model UserWatchlist {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  politicianId String   @map("politician_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, politicianId])
+  @@map("user_watchlists")
+}
+
+// ══════════════════════════════════════════════════════════════
+// POLITICAL PARTIES
+// ══════════════════════════════════════════════════════════════
+
+model PoliticalParty {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  abbreviation String   @unique
+  slug         String   @unique
+  color        String   @default("#6B7280")
+  logoUrl      String?  @map("logo_url")
+  foundedYear  Int?     @map("founded_year")
+  ideology     String?
+  chairman     String?
+  headquarters String?
+  websiteUrl   String?  @map("website_url")
+  seatsTotal   Int      @default(0) @map("seats_total")
+  senateSeats  Int      @default(0) @map("senate_seats")
+  houseSeats   Int      @default(0) @map("house_seats")
+  governors    Int      @default(0)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  politicians        Politician[]
+  defectionsFrom     PartyDefection[]    @relation("DefectionFrom")
+  defectionsTo       PartyDefection[]    @relation("DefectionTo")
+  electionWins       Election[]
+  electionCandidates ElectionCandidate[]
+
+  @@map("political_parties")
+}
+
+// ══════════════════════════════════════════════════════════════
+// POLITICIANS
+// ══════════════════════════════════════════════════════════════
+
+enum Chamber {
+  SENATE
+  HOUSE_OF_REPRESENTATIVES
+
+  @@map("chamber")
+}
+
+model Politician {
+  id               String    @id @default(uuid()) @db.Uuid
+  slug             String    @unique
+  name             String
+  partyId          String?   @map("party_id") @db.Uuid
+  position         String
+  chamber          Chamber?
+  constituency     String
+  state            String
+  lga              String?
+  photoUrl         String?   @map("photo_url")
+  dateOfBirth      DateTime? @map("date_of_birth") @db.Date
+  gender           String?
+  education        String?
+  biography        String?   @db.Text
+  firstElected     Int?      @map("first_elected")
+  currentTermStart Int?      @map("current_term_start")
+  yearsInOffice    Int       @default(0) @map("years_in_office")
+  billsSponsored   Int       @default(0) @map("bills_sponsored")
+  attendanceRate   Decimal   @default(0) @map("attendance_rate") @db.Decimal(5, 2)
+  isActive         Boolean   @default(true) @map("is_active")
+  sourceUrl        String?   @map("source_url")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  party                PoliticalParty?       @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  contacts             PoliticianContact?
+  votingRecords        VotingRecord[]
+  sponsoredBills       SponsoredBill[]
+  assetDeclarations    AssetDeclaration[]
+  constituencyProjects ConstituencyProject[]
+  defections           PartyDefection[]
+  careerEvents         CareerEvent[]
+  committees           CommitteeAssignment[]
+  corruptionCases      CorruptionCase[]
+  socialMentions       SocialMention[]
+  topicMentions        TopicMention[]
+  socialStats          PoliticianSocialStats?
+  watchlistedBy        UserWatchlist[]
+
+  @@index([partyId])
+  @@index([state])
+  @@index([chamber])
+  @@index([isActive])
+  @@map("politicians")
+}
+
+model PoliticianContact {
+  id              String   @id @default(uuid()) @db.Uuid
+  politicianId    String   @unique @map("politician_id") @db.Uuid
+  email           String?
+  phone           String?
+  officeAddress   String?  @map("office_address")
+  website         String?
+  twitterHandle   String?  @map("twitter_handle")
+  facebookUrl     String?  @map("facebook_url")
+  instagramHandle String?  @map("instagram_handle")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+
+  @@map("politician_contacts")
+}
+
+// ══════════════════════════════════════════════════════════════
+// VOTING RECORDS
+// ══════════════════════════════════════════════════════════════
+
+enum Vote {
+  YES
+  NO
+  ABSTAIN
+  ABSENT
+}
+
+enum BillStatus {
+  FIRST_READING
+  SECOND_READING
+  THIRD_READING
+  PASSED
+  REJECTED
+  WITHDRAWN
+}
+
+model VotingRecord {
+  id           String      @id @default(uuid()) @db.Uuid
+  politicianId String      @map("politician_id") @db.Uuid
+  billTitle    String      @map("bill_title")
+  billId       String?     @map("bill_id") @db.Uuid
+  vote         Vote
+  sessionDate  DateTime    @map("session_date") @db.Date
+  billStatus   BillStatus? @map("bill_status")
+  sessionId    String?     @map("session_id")
+  sourceUrl    String?     @map("source_url")
+  createdAt    DateTime    @default(now()) @map("created_at")
+
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+
+  @@index([politicianId])
+  @@index([sessionDate(sort: Desc)])
+  @@map("voting_records")
+}
+
+// ══════════════════════════════════════════════════════════════
+// SPONSORED BILLS
+// ══════════════════════════════════════════════════════════════
+
+model SponsoredBill {
+  id             String     @id @default(uuid()) @db.Uuid
+  politicianId   String     @map("politician_id") @db.Uuid
+  title          String
+  summary        String?    @db.Text
+  status         BillStatus @default(FIRST_READING)
+  chamber        Chamber
+  dateIntroduced DateTime   @map("date_introduced") @db.Date
+  datePassed     DateTime?  @map("date_passed") @db.Date
+  coSponsors     Int        @default(0) @map("co_sponsors")
+  fullTextUrl    String?    @map("full_text_url")
+  sourceUrl      String?    @map("source_url")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  politician Politician    @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+  readings   BillReading[]
+
+  @@index([politicianId])
+  @@index([status])
+  @@index([chamber])
+  @@index([dateIntroduced(sort: Desc)])
+  @@map("sponsored_bills")
+}
+
+model BillReading {
+  id            String   @id @default(uuid()) @db.Uuid
+  billId        String   @map("bill_id") @db.Uuid
+  readingNumber Int      @map("reading_number")
+  date          DateTime @db.Date
+  outcome       String
+  votesFor      Int?     @map("votes_for")
+  votesAgainst  Int?     @map("votes_against")
+  votesAbstain  Int?     @map("votes_abstain")
+  sourceUrl     String?  @map("source_url")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  bill SponsoredBill @relation(fields: [billId], references: [id], onDelete: Cascade)
+
+  @@unique([billId, readingNumber])
+  @@index([billId])
+  @@map("bill_readings")
+}
+
+// ══════════════════════════════════════════════════════════════
+// ASSETS & PROJECTS
+// ══════════════════════════════════════════════════════════════
+
+model AssetDeclaration {
+  id                 String   @id @default(uuid()) @db.Uuid
+  politicianId       String   @map("politician_id") @db.Uuid
+  category           String
+  description        String
+  estimatedValueKobo BigInt   @map("estimated_value_kobo")
+  yearDeclared       Int      @map("year_declared")
+  sourceDocumentUrl  String?  @map("source_document_url")
+  verified           Boolean  @default(false)
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+
+  @@index([politicianId])
+  @@index([yearDeclared(sort: Desc)])
+  @@map("asset_declarations")
+}
+
+enum ProjectStatus {
+  NOT_STARTED
+  ONGOING
+  COMPLETED
+  ABANDONED
+}
+
+model ConstituencyProject {
+  id            String        @id @default(uuid()) @db.Uuid
+  politicianId  String        @map("politician_id") @db.Uuid
+  title         String
+  description   String?       @db.Text
+  location      String
+  budgetKobo    BigInt        @map("budget_kobo")
+  status        ProjectStatus @default(NOT_STARTED)
+  year          Int
+  completionPct Int           @default(0) @map("completion_pct")
+  contractor    String?
+  sourceUrl     String?       @map("source_url")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+
+  @@index([politicianId])
+  @@index([status])
+  @@map("constituency_projects")
+}
+
+// ══════════════════════════════════════════════════════════════
+// PARTY DEFECTIONS
+// ══════════════════════════════════════════════════════════════
+
+model PartyDefection {
+  id            String   @id @default(uuid()) @db.Uuid
+  politicianId  String   @map("politician_id") @db.Uuid
+  fromPartyId   String?  @map("from_party_id") @db.Uuid
+  toPartyId     String?  @map("to_party_id") @db.Uuid
+  defectionDate DateTime @map("defection_date") @db.Date
+  reason        String?  @db.Text
+  sourceUrl     String?  @map("source_url")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  politician Politician      @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+  fromParty  PoliticalParty? @relation("DefectionFrom", fields: [fromPartyId], references: [id])
+  toParty    PoliticalParty? @relation("DefectionTo", fields: [toPartyId], references: [id])
+
+  @@index([politicianId])
+  @@index([defectionDate(sort: Desc)])
+  @@map("party_defections")
+}
+
+// ══════════════════════════════════════════════════════════════
+// CAREER & COMMITTEES
+// ══════════════════════════════════════════════════════════════
+
+model CareerEvent {
+  id           String   @id @default(uuid()) @db.Uuid
+  politicianId String   @map("politician_id") @db.Uuid
+  year         Int
+  title        String
+  description  String?
+  category     String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+
+  @@index([politicianId])
+  @@index([year(sort: Desc)])
+  @@map("career_events")
+}
+
+model CommitteeAssignment {
+  id            String    @id @default(uuid()) @db.Uuid
+  politicianId  String    @map("politician_id") @db.Uuid
+  committeeName String    @map("committee_name")
+  role          String    @default("Member")
+  startDate     DateTime  @map("start_date") @db.Date
+  endDate       DateTime? @map("end_date") @db.Date
+  chamber       Chamber
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+
+  @@index([politicianId])
+  @@map("committee_assignments")
+}
+
+// ══════════════════════════════════════════════════════════════
+// ELECTIONS
+// ══════════════════════════════════════════════════════════════
+
+enum ElectionLevel {
+  FEDERAL
+  STATE
+  LOCAL_GOVERNMENT
+  PARTY_PRIMARY
+}
+
+model Election {
+  id               String        @id @default(uuid()) @db.Uuid
+  year             Int
+  type             String
+  level            ElectionLevel
+  state            String?
+  lga              String?
+  ward             String?
+  winnerName       String        @map("winner_name")
+  winnerPartyId    String?       @map("winner_party_id") @db.Uuid
+  winnerVotes      Int           @map("winner_votes")
+  totalVotes       Int           @map("total_votes")
+  registeredVoters Int?          @map("registered_voters")
+  turnoutPct       Decimal?      @map("turnout_pct") @db.Decimal(5, 2)
+  margin           String?
+  declaredDate     DateTime?     @map("declared_date") @db.Date
+  sourceUrl        String?       @map("source_url")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  winnerParty PoliticalParty?    @relation(fields: [winnerPartyId], references: [id])
+  candidates  ElectionCandidate[]
+
+  @@index([year(sort: Desc)])
+  @@index([level])
+  @@index([state])
+  @@index([winnerPartyId])
+  @@map("elections")
+}
+
+model ElectionCandidate {
+  id            String   @id @default(uuid()) @db.Uuid
+  electionId    String   @map("election_id") @db.Uuid
+  candidateName String   @map("candidate_name")
+  partyId       String?  @map("party_id") @db.Uuid
+  votes         Int      @default(0)
+  position      Int      @default(0)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  election Election        @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  party    PoliticalParty? @relation(fields: [partyId], references: [id])
+
+  @@index([electionId])
+  @@map("election_candidates")
+}
+
+// ══════════════════════════════════════════════════════════════
+// CORRUPTION CASES
+// ══════════════════════════════════════════════════════════════
+
+enum CaseStatus {
+  UNDER_INVESTIGATION
+  ONGOING
+  CONVICTED
+  ACQUITTED
+  DISMISSED
+  APPEALING
+}
+
+enum Agency {
+  EFCC
+  ICPC
+  CCB
+  NFIU
+}
+
+model CorruptionCase {
+  id                  String     @id @default(uuid()) @db.Uuid
+  politicianId        String?    @map("politician_id") @db.Uuid
+  politicianName      String     @map("politician_name")
+  agency              Agency
+  caseNumber          String?    @map("case_number")
+  charges             String     @db.Text
+  amountInvolvedKobo  BigInt?    @map("amount_involved_kobo")
+  amountRecoveredKobo BigInt     @default(0) @map("amount_recovered_kobo")
+  status              CaseStatus @default(UNDER_INVESTIGATION)
+  court               String?
+  judge               String?
+  filingDate          DateTime?  @map("filing_date") @db.Date
+  verdictDate         DateTime?  @map("verdict_date") @db.Date
+  sentence            String?
+  description         String     @db.Text
+  sourceUrl           String?    @map("source_url")
+  isActive            Boolean    @default(true) @map("is_active")
+  createdAt           DateTime   @default(now()) @map("created_at")
+  updatedAt           DateTime   @updatedAt @map("updated_at")
+
+  politician Politician? @relation(fields: [politicianId], references: [id], onDelete: SetNull)
+
+  @@index([politicianId])
+  @@index([agency])
+  @@index([status])
+  @@index([filingDate(sort: Desc)])
+  @@map("corruption_cases")
+}
+
+// ══════════════════════════════════════════════════════════════
+// SOCIAL MEDIA
+// ══════════════════════════════════════════════════════════════
+
+enum SocialPlatform {
+  TWITTER
+  FACEBOOK
+  INSTAGRAM
+  TIKTOK
+  YOUTUBE
+}
+
+enum Sentiment {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+model SocialMention {
+  id              String         @id @default(uuid()) @db.Uuid
+  politicianId    String         @map("politician_id") @db.Uuid
+  platform        SocialPlatform
+  content         String         @db.Text
+  url             String?
+  publishedAt     DateTime       @map("published_at")
+  sentiment       Sentiment      @default(NEUTRAL)
+  sentimentScore  Decimal?       @map("sentiment_score") @db.Decimal(4, 3)
+  engagementTotal Int            @default(0) @map("engagement_total")
+  likes           Int            @default(0)
+  shares          Int            @default(0)
+  comments        Int            @default(0)
+  isByPolitician  Boolean        @default(false) @map("is_by_politician")
+  createdAt       DateTime       @default(now()) @map("created_at")
+
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+
+  @@index([politicianId])
+  @@index([publishedAt(sort: Desc)])
+  @@index([platform])
+  @@index([sentiment])
+  @@map("social_mentions")
+}
+
+model TopicMention {
+  id           String   @id @default(uuid()) @db.Uuid
+  politicianId String   @map("politician_id") @db.Uuid
+  topic        String
+  mentionCount Int      @default(1) @map("mention_count")
+  avgSentiment Decimal  @default(0) @map("avg_sentiment") @db.Decimal(4, 3)
+  periodStart  DateTime @map("period_start") @db.Date
+  periodEnd    DateTime @map("period_end") @db.Date
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+
+  @@index([politicianId])
+  @@map("topic_mentions")
+}
+
+model PoliticianSocialStats {
+  id               String   @id @default(uuid()) @db.Uuid
+  politicianId     String   @unique @map("politician_id") @db.Uuid
+  overallSentiment Decimal  @default(0) @map("overall_sentiment") @db.Decimal(4, 3)
+  totalMentions    Int      @default(0) @map("total_mentions")
+  followerCount    Int      @default(0) @map("follower_count")
+  engagementRate   Decimal  @default(0) @map("engagement_rate") @db.Decimal(5, 2)
+  lastComputedAt   DateTime @default(now()) @map("last_computed_at")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  politician Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+
+  @@map("politician_social_stats")
+}
+
+// ══════════════════════════════════════════════════════════════
+// DATA SOURCES & AUDIT
+// ══════════════════════════════════════════════════════════════
+
+model DataSource {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String    @unique
+  url           String
+  type          String
+  description   String?
+  lastScrapedAt DateTime? @map("last_scraped_at")
+  lastSuccessAt DateTime? @map("last_success_at")
+  status        String    @default("active")
+  errorCount    Int       @default(0) @map("error_count")
+  recordsCount  Int       @default(0) @map("records_count")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@map("data_sources")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  tableName String   @map("table_name")
+  recordId  String   @map("record_id") @db.Uuid
+  action    String
+  changedBy String?  @map("changed_by") @db.Uuid
+  oldValues Json?    @map("old_values")
+  newValues Json?    @map("new_values")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([tableName])
+  @@index([recordId])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_log")
+}
