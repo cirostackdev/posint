@@ -1,5 +1,7 @@
 FROM node:22-alpine AS builder
 
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -18,7 +20,8 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 
-RUN addgroup -g 1001 -S nodejs && adduser -S nestjs -u 1001
+RUN apk add --no-cache openssl && \
+    addgroup -g 1001 -S nodejs && adduser -S nestjs -u 1001
 USER nestjs
 
 EXPOSE 4000
