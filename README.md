@@ -17,135 +17,177 @@ POSINT aggregates, analyzes, and presents verifiable data on Nigerian politics �
 
 ## Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 15 (App Router), React 19, TypeScript 5 |
-| Styling | Tailwind CSS 4, shadcn/ui, Radix UI |
-| State | TanStack Query 5 (server), Zustand 5 (client) |
-| API | tRPC 11 (end-to-end type safety) |
-| Database | PostgreSQL via Supabase |
+### Frontend (`posint-frontend`)
+
+| Concern | Technology |
+|---------|-----------|
+| Framework | Next.js 15 (App Router), React 19, TypeScript 5 |
+| Styling | Tailwind CSS 3, shadcn/ui, Radix UI |
+| State (server) | TanStack Query 5 |
+| State (client) | Zustand 5 |
+| API | REST via fetch client → NestJS backend |
+| Realtime | Pusher.js |
+| Charts | Recharts |
+| Forms | React Hook Form + Zod |
+| Testing | Vitest |
+
+### Backend (`posint-backend`)
+
+| Concern | Technology |
+|---------|-----------|
+| Framework | NestJS 10, TypeScript 5 |
+| Database | Neon PostgreSQL (via Prisma 5) |
+| Auth | JWT (Passport.js — access + refresh tokens) |
 | Cache | Upstash Redis |
-| Auth | Supabase Auth + Row-Level Security |
-| Realtime | Supabase Realtime |
-| Pipeline | Inngest (job queue), Playwright (scraping), OpenAI (NLP) |
-| Testing | Vitest + Playwright (E2E) |
-| Hosting | Vercel |
+| Realtime | Pusher Channels |
+| Job Queue | BullMQ |
+| Scraping | Cheerio |
+| NLP | OpenAI API |
+| Testing | Jest |
 
 ## Project Structure
 
 ```
 POSINT/
-├── posint-frontend/     # Next.js 15 App Router frontend
-├── posint-backend/      # NestJS 10 API (alternative backend)
+├── posint-frontend/     # Next.js 15 frontend (feature-based architecture)
+└── posint-backend/      # NestJS 10 REST API
 ```
 
-### Frontend architecture (feature-based)
+### Frontend (`src/`)
 
 ```
 src/
 ├── app/                 # Next.js App Router (thin route files)
-├── features/            # Feature modules
-│   ├── politicians/     # Profiles, voting records, assets
-│   ├── elections/       # Results explorer
-│   ├── legislature/     # Bill tracker
-│   ├── corruption/      # Anti-corruption case tracker
-│   ├── parties/         # Party seat distribution
-│   ├── compare/         # Side-by-side politician comparison
-│   ├── social/          # Social media & sentiment
-│   ├── search/          # Global search
-│   ├── auth/            # Authentication
-│   └── admin/           # Admin panel
-├── shared/              # Cross-feature components, lib, stores
-├── server/              # tRPC routers, DB queries
-└── pipeline/            # Data ingestion jobs
+├── features/            # Feature modules (politicians, elections, legislature,
+│                        # corruption, parties, compare, social, search, auth, admin)
+├── shared/
+│   ├── components/      # Layout, shared UI, shadcn/ui primitives
+│   ├── config/          # nav.ts, site.ts, parties.ts
+│   ├── lib/             # API client, utils, constants
+│   └── stores/          # Global Zustand stores (auth, theme)
+└── middleware.ts        # Route protection
+```
+
+### Backend (`src/`)
+
+```
+src/
+├── admin/               # Admin management
+├── auth/                # JWT auth (signup, login, refresh)
+├── politicians/         # Politicians CRUD + queries
+├── elections/           # Election results
+├── legislature/         # Bill tracking
+├── corruption/          # EFCC/ICPC cases
+├── parties/             # Political parties
+├── social/              # Social media & sentiment
+├── compare/             # Comparison aggregations
+├── search/              # Full-text search
+├── pipeline/            # Data ingestion (BullMQ jobs + scrapers)
+├── prisma/              # Prisma service
+├── redis/               # Upstash Redis service
+├── pusher/              # Pusher realtime service
+└── main.ts
 ```
 
 ## Getting Started
 
-### Prerequisites
+### Backend
 
-- Node.js 20+
-- A Supabase project (PostgreSQL + Auth + Storage + Realtime)
-- Upstash Redis instance
-- OpenAI API key (for NLP features)
+```bash
+cd posint-backend
+
+npm install
+
+cp .env.example .env
+# Fill in Neon DATABASE_URL, DIRECT_DATABASE_URL, Redis, Pusher, JWT secrets
+
+npm run db:migrate        # Run Prisma migrations
+npm run db:seed           # Seed development data
+npm run start:dev         # Start on port 4000
+```
 
 ### Frontend
 
 ```bash
 cd posint-frontend
 
-# Install dependencies
 npm install
 
-# Copy environment template
 cp .env.local.example .env.local
-# Fill in your Supabase, Upstash, and OpenAI credentials
+# Set NEXT_PUBLIC_API_URL, NEXT_PUBLIC_PUSHER_KEY, NEXT_PUBLIC_PUSHER_CLUSTER
 
-# Run migrations
-npm run db:migrate
-
-# Seed development data
-npm run db:seed
-
-# Start dev server
-npm run dev
-```
-
-### Backend (NestJS)
-
-```bash
-cd posint-backend
-
-# Install dependencies
-npm install
-
-# Copy environment template
-cp .env.example .env
-# Fill in Neon PostgreSQL, Upstash Redis, Pusher credentials
-
-# Run migrations
-npm run db:migrate
-
-# Seed data
-npm run db:seed
-
-# Start dev server
-npm run start:dev
+npm run dev               # Start on port 3000
 ```
 
 ## Environment Variables
 
+### Backend (`.env`)
+
 ```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_APP_URL=
-NEXT_PUBLIC_PUSHER_KEY=
-NEXT_PUBLIC_PUSHER_CLUSTER=
+NODE_ENV=development
+PORT=4000
+FRONTEND_URL=http://localhost:3000
+
+# Neon PostgreSQL
+DATABASE_URL=postgresql://user:password@ep-xxx.neon.tech/posint?sslmode=require&pgbouncer=true
+DIRECT_DATABASE_URL=postgresql://user:password@ep-xxx.neon.tech/posint?sslmode=require
+
+# Upstash Redis
+UPSTASH_REDIS_REST_URL=https://xxx.upstash.io
+UPSTASH_REDIS_REST_TOKEN=
+REDIS_HOST=xxx.upstash.io
+REDIS_PORT=6379
+REDIS_PASSWORD=
+
+# JWT
+JWT_ACCESS_SECRET=
+JWT_REFRESH_SECRET=
+
+# Pusher
 PUSHER_APP_ID=
+NEXT_PUBLIC_PUSHER_KEY=
 PUSHER_SECRET=
+PUSHER_CLUSTER=
+
+# OpenAI
 OPENAI_API_KEY=
-UPSTASH_REDIS_URL=
-UPSTASH_REDIS_TOKEN=
+
+# Twitter/X
+TWITTER_BEARER_TOKEN=
 ```
 
-## Development
+### Frontend (`.env.local`)
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
+NEXT_PUBLIC_PUSHER_KEY=
+NEXT_PUBLIC_PUSHER_CLUSTER=
+```
+
+## Development Commands
+
+### Backend
 
 ```bash
-# Type check
-npm run typecheck
+npm run start:dev        # Dev server (watch mode)
+npm run build            # Production build
+npm run test             # Jest unit tests
+npm run test:e2e         # End-to-end tests
+npm run typecheck        # TypeScript check
+npm run lint             # ESLint
+npm run db:migrate:dev   # Create + run migration
+npm run db:studio        # Prisma Studio
+```
 
-# Lint
-npm run lint
+### Frontend
 
-# Run tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Generate Supabase types
-npm run db:types
+```bash
+npm run dev              # Dev server
+npm run build            # Production build
+npm run lint             # ESLint
+npm run typecheck        # TypeScript check
+npm run test             # Vitest
+npm run test:watch       # Vitest watch
 ```
 
 ## Design Principles
@@ -155,17 +197,6 @@ npm run db:types
 3. **Performance on low-end devices** — Target 3G connections and budget Android phones.
 4. **Politically neutral** — Platform presents facts, not opinions. No editorial bias.
 5. **Open and auditable** — Data pipelines are transparent. Methodology is documented.
-
-## Data Sources
-
-| Source | Frequency | Method |
-|--------|-----------|--------|
-| NASS (National Assembly) | Daily | Playwright scraper |
-| INEC (Election results) | Event-driven | Manual + scraper |
-| EFCC/ICPC press releases | 6 hours | RSS + HTML parser |
-| Federal Gazette | Weekly | PDF parser |
-| Social media (X/Twitter) | 1 hour | API polling |
-| News mentions | 2 hours | RSS aggregation |
 
 ## License
 
