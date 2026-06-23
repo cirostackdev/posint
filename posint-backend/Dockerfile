@@ -6,7 +6,7 @@ RUN npm ci
 
 COPY . .
 RUN npx prisma generate
-RUN npm run build
+RUN npm run build && echo "--- dist contents:" && ls -la dist/ || echo "--- dist missing entirely"
 RUN ls dist/main.js || (echo "ERROR: dist/main.js not found after build" && exit 1)
 
 # Production image
