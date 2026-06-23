@@ -57,6 +57,11 @@ async function handleResponse<T>(response: Response): Promise<T> {
   }
 
   const body: ApiResponse<T> = await response.json()
+  // Paginated list responses have `meta` at the envelope root alongside `data`.
+  // Return both so list components can access data.data and data.meta.
+  if (body.meta !== undefined) {
+    return { data: body.data, meta: body.meta } as unknown as T
+  }
   return body.data
 }
 
