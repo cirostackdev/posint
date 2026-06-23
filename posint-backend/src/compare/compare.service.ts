@@ -29,7 +29,15 @@ export class CompareService {
           socialStats: true,
         },
       })
-      return { politicians }
+      return {
+        politicians: politicians.map(p => ({
+          ...p,
+          assetDeclarations: p.assetDeclarations.map(a => ({
+            ...a,
+            estimatedValueKobo: a.estimatedValueKobo.toString(),
+          })),
+        })),
+      }
     }, 300)
   }
 }

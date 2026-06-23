@@ -1,6 +1,7 @@
 import { Controller, Get, Patch, Delete, Param, Query, Body, HttpCode, HttpStatus } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger'
 import { Roles } from '../common/decorators/roles.decorator'
+import { Public } from '../common/decorators/public.decorator'
 import { CurrentUser } from '../common/decorators/current-user.decorator'
 import { JwtPayload } from '../auth/strategies/jwt.strategy'
 import { AdminService } from './admin.service'
@@ -14,7 +15,7 @@ import { UpdateRoleDto } from './dto/update-role.dto'
 export class AdminController {
   constructor(private adminService: AdminService) {}
 
-  @Get('stats') @ApiOperation({ summary: 'Platform overview stats' })
+  @Get('stats') @Public() @ApiOperation({ summary: 'Platform overview stats' })
   getStats() { return this.adminService.getPlatformStats() }
 
   @Get('users') @ApiOperation({ summary: 'List users' })
