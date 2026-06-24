@@ -1,6 +1,7 @@
 # Spec docs (keep README.md only)
 *.md
 !README.md
+!CLAUDE.md
 
 # Dependencies
 node_modules/
