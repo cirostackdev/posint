@@ -311,6 +311,8 @@ export class PoliticiansService {
       constituency: p.constituency,
       state: p.state,
       photoUrl: p.photoUrl,
+      // Note: billsSponsored is a denormalized counter that may drift from the actual count in sponsored_bills table.
+      // Consider periodically reconciling or moving to a computed view if accuracy is critical.
       billsSponsored: p.billsSponsored,
       attendanceRate: Number(p.attendanceRate),
       yearsInOffice: p.yearsInOffice,

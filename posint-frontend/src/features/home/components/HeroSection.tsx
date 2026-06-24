@@ -10,7 +10,7 @@ export function HeroSection() {
 
   const pills = [
     { icon: Database, label: stats ? `${stats.politicians}+ Politicians` : "Politicians Tracked" },
-    { icon: FileSearch, label: stats ? `${stats.bills} Active Bills` : "Bills Monitored" },
+    { icon: FileSearch, label: stats ? `${stats.bills - stats.billsPassed} Bills In Progress` : "Bills Monitored" },
     { icon: Scale, label: stats ? `${stats.cases} Corruption Cases` : "Corruption Cases" },
   ]
 
