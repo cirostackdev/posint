@@ -3,6 +3,7 @@ import { Logger } from '@nestjs/common'
 import { Job } from 'bullmq'
 import { PrismaService } from '../../prisma/prisma.service'
 import { AiService } from '../../services/ai.service'
+import { BotDetectionService } from '../../analytics/bot-detection.service'
 import { QUEUE_NAMES } from '../pipeline.constants'
 
 @Processor(QUEUE_NAMES.COMPUTE_SENTIMENT, { concurrency: 2 })
@@ -12,6 +13,7 @@ export class SentimentProcessor extends WorkerHost {
   constructor(
     private prisma: PrismaService,
     private ai: AiService,
+    private botDetection: BotDetectionService,
   ) {
     super()
   }
@@ -27,25 +29,54 @@ export class SentimentProcessor extends WorkerHost {
 
     this.logger.log(`Computing sentiment for ${mentions.length} mentions`)
 
+    let processed = 0
     for (const mention of mentions) {
+      const botScore = this.botDetection.scoreMention({
+        content: mention.content,
+        publishedAt: mention.publishedAt,
+        likesCount: mention.likes,
+        sharesCount: mention.shares,
+        commentsCount: mention.comments,
+        accountAgedays: 365,
+        similarContentCount: 0,
+      })
+
+      // Skip full NLP for high-confidence bots — still neutral-score them
+      if (botScore.score > 0.8) {
+        await this.prisma.socialMention.update({
+          where: { id: mention.id },
+          data: { sentiment: 'NEUTRAL', sentimentScore: 0 },
+        })
+        processed++
+        continue
+      }
+
       const result = await this.ai.analyzeSentiment(mention.content)
+      // Weight the score by human probability (bots with score 0.5 reduce weight by 50%)
+      const weightedScore = result.value.score * this.botDetection.humanWeight(botScore.score)
+
       await this.prisma.socialMention.update({
         where: { id: mention.id },
-        data: { sentiment: result.value.label, sentimentScore: result.value.score },
+        data: {
+          sentiment: result.value.label,
+          sentimentScore: weightedScore,
+        },
       })
+
+      processed++
     }
 
-    const politicianIds = [...new Set(mentions.map((m) => m.politicianId))]
+    const politicianIds = [...new Set(mentions.map(m => m.politicianId))]
     for (const politicianId of politicianIds) {
       await this.recomputeSocialStats(politicianId)
     }
 
-    return { processed: mentions.length }
+    return { processed, total: mentions.length }
   }
 
   private async recomputeSocialStats(politicianId: string) {
     const stats = await this.prisma.socialMention.aggregate({
-      where: { politicianId },
+      where: { politicianId, sentimentScore: { not: null } },
       _avg: { sentimentScore: true, engagementTotal: true },
       _count: { _all: true },
     })
