@@ -45,13 +45,13 @@ export class LegislatureService {
         this.prisma.sponsoredBill.count({ where: { status: { in: ['FIRST_READING','SECOND_READING','THIRD_READING'] } } }),
         this.prisma.$queryRaw<Array<{ month: string; bills: bigint; passed: bigint; rejected: bigint }>>`
           SELECT
-            TO_CHAR(date_introduced, 'Mon') AS month,
+            TO_CHAR(date_introduced, 'Mon YYYY') AS month,
             COUNT(*) AS bills,
             COUNT(*) FILTER (WHERE status = 'PASSED') AS passed,
             COUNT(*) FILTER (WHERE status = 'REJECTED') AS rejected
           FROM sponsored_bills
           WHERE date_introduced >= ${twelveMonthsAgo}
-          GROUP BY DATE_TRUNC('month', date_introduced), TO_CHAR(date_introduced, 'Mon')
+          GROUP BY DATE_TRUNC('month', date_introduced), TO_CHAR(date_introduced, 'Mon YYYY')
           ORDER BY DATE_TRUNC('month', date_introduced) ASC
         `,
       ])

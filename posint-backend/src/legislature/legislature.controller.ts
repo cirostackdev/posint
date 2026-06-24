@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Query, Body, HttpCode, HttpStatus } from '@nestjs/common'
+import { Controller, Get, Post, Patch, Delete, Param, Query, Body, HttpCode, HttpStatus, ParseUUIDPipe } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger'
 import { Public } from '../common/decorators/public.decorator'
 import { Roles } from '../common/decorators/roles.decorator'
@@ -21,14 +21,14 @@ export class LegislatureController {
   getStats() { return this.legislatureService.getBillStats() }
 
   @Get('bills/:id') @Public() @ApiOperation({ summary: 'Bill detail' })
-  findById(@Param('id') id: string) { return this.legislatureService.findBillById(id) }
+  findById(@Param('id', ParseUUIDPipe) id: string) { return this.legislatureService.findBillById(id) }
 
   @Post('bills') @Roles('ADMIN') @ApiBearerAuth() @ApiOperation({ summary: 'Create bill (admin)' })
   create(@Body() dto: CreateBillDto, @CurrentUser() user: JwtPayload) { return this.legislatureService.createBill(dto, user.sub) }
 
   @Patch('bills/:id') @Roles('ADMIN') @ApiBearerAuth() @ApiOperation({ summary: 'Update bill (admin)' })
-  update(@Param('id') id: string, @Body() dto: UpdateBillDto, @CurrentUser() user: JwtPayload) { return this.legislatureService.updateBill(id, dto, user.sub) }
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateBillDto, @CurrentUser() user: JwtPayload) { return this.legislatureService.updateBill(id, dto, user.sub) }
 
   @Delete('bills/:id') @Roles('ADMIN') @HttpCode(HttpStatus.NO_CONTENT) @ApiBearerAuth() @ApiOperation({ summary: 'Delete bill (admin)' })
-  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) { return this.legislatureService.removeBill(id, user.sub) }
+  remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: JwtPayload) { return this.legislatureService.removeBill(id, user.sub) }
 }
