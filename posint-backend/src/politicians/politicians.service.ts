@@ -73,7 +73,6 @@ export class PoliticiansService {
           where: { slug, isActive: true },
           include: {
             party: true,
-            contacts: true,
             votingRecords: { orderBy: { sessionDate: 'desc' }, take: 50 },
             sponsoredBills: {
               orderBy: { dateIntroduced: 'desc' },
@@ -100,8 +99,7 @@ export class PoliticiansService {
           where: { politicianId: politician.id, isActive: true },
         })
 
-        const { contacts, ...safeFields } = politician
-        return { ...safeFields, corruptionCases }
+        return { ...politician, corruptionCases }
       },
       3600,
     )
