@@ -40,13 +40,50 @@ export class PartiesService {
       : 0
     const totalBills = members.reduce((sum, p) => sum + p.billsSponsored, 0)
 
-    const [corruptionCases, defectionsIn, defectionsOut] = await Promise.all([
+    const [corruptionCases, defectionsInto, defectionsOut] = await Promise.all([
       this.prisma.corruptionCase.count({ where: { isActive: true, politician: { partyId: party.id } } }),
-      this.prisma.partyDefection.count({ where: { toPartyId: party.id } }),
-      this.prisma.partyDefection.count({ where: { fromPartyId: party.id } }),
+      this.prisma.partyDefection.findMany({
+        where: { toPartyId: party.id },
+        select: {
+          politician: { select: { name: true } },
+          fromParty: { select: { abbreviation: true } },
+          defectionDate: true,
+          reason: true,
+        },
+        orderBy: { defectionDate: 'desc' },
+        take: 20,
+      }),
+      this.prisma.partyDefection.findMany({
+        where: { fromPartyId: party.id },
+        select: {
+          politician: { select: { name: true } },
+          toParty: { select: { abbreviation: true } },
+          defectionDate: true,
+          reason: true,
+        },
+        orderBy: { defectionDate: 'desc' },
+        take: 20,
+      }),
     ])
 
-    return { ...party, avgAttendance, totalBills, corruptionCases, defectionsIn, defectionsOut }
+    return {
+      ...party,
+      avgAttendance,
+      totalBills,
+      corruptionCases,
+      defectionsInto: defectionsInto.map(d => ({
+        name: d.politician.name,
+        from: d.fromParty?.abbreviation ?? '',
+        year: new Date(d.defectionDate).getFullYear(),
+        reason: d.reason ?? '',
+      })),
+      defectionsOut: defectionsOut.map(d => ({
+        name: d.politician.name,
+        to: d.toParty?.abbreviation ?? '',
+        year: new Date(d.defectionDate).getFullYear(),
+        reason: d.reason ?? '',
+      })),
+    }
   }
 
   async create(dto: CreatePartyDto, adminUserId: string) {
