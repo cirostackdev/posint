@@ -31,7 +31,7 @@ export class SentimentProcessor extends WorkerHost {
       const result = await this.ai.analyzeSentiment(mention.content)
       await this.prisma.socialMention.update({
         where: { id: mention.id },
-        data: { sentiment: result.label, sentimentScore: result.score },
+        data: { sentiment: result.value.label, sentimentScore: result.value.score },
       })
     }
 
