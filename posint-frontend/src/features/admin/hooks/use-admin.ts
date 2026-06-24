@@ -41,7 +41,7 @@ export function usePipelineJobs() {
   return useQuery({
     queryKey: ["pipeline-jobs"],
     queryFn: () => apiGet<PipelineJob[]>("/pipeline/jobs"),
-    refetchInterval: 10_000,
+    refetchInterval: 60_000,
   })
 }
 

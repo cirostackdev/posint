@@ -52,7 +52,7 @@ export class PartiesService {
   async create(dto: CreatePartyDto, adminUserId: string) {
     const party = await this.prisma.politicalParty.create({ data: dto })
     await this.prisma.auditLog.create({ data: { tableName: 'political_parties', recordId: party.id, action: 'INSERT', newValues: party, changedBy: adminUserId } })
-    await this.redis.delPattern('parties:*')
+    await this.redis.del('parties:list', 'parties:seats', 'stats:platform')
     return party
   }
 
@@ -61,7 +61,7 @@ export class PartiesService {
     if (!existing) throw new NotFoundException('Party not found')
     const updated = await this.prisma.politicalParty.update({ where: { id }, data: dto })
     await this.prisma.auditLog.create({ data: { tableName: 'political_parties', recordId: id, action: 'UPDATE', oldValues: existing, newValues: updated, changedBy: adminUserId } })
-    await this.redis.delPattern('parties:*')
+    await this.redis.del('parties:list', 'parties:seats', 'stats:platform')
     return updated
   }
 }

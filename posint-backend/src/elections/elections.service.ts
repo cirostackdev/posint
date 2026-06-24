@@ -70,7 +70,7 @@ export class ElectionsService {
   async create(dto: CreateElectionDto, adminUserId: string) {
     const election = await this.prisma.election.create({ data: dto as any })
     await this.prisma.auditLog.create({ data: { tableName: 'elections', recordId: election.id, action: 'INSERT', newValues: election, changedBy: adminUserId } })
-    await this.redis.delPattern('elections:*')
+    await this.redis.del('elections:stats', 'stats:platform')
     await this.pusher.onElectionDeclared({ id: election.id, type: election.type, year: election.year, level: election.level, winnerName: election.winnerName })
     return election
   }
@@ -80,7 +80,7 @@ export class ElectionsService {
     if (!existing) throw new NotFoundException('Election not found')
     const updated = await this.prisma.election.update({ where: { id }, data: dto as any })
     await this.prisma.auditLog.create({ data: { tableName: 'elections', recordId: id, action: 'UPDATE', oldValues: existing, newValues: updated, changedBy: adminUserId } })
-    await this.redis.delPattern('elections:*')
+    await this.redis.del('elections:stats', 'stats:platform')
     return updated
   }
 
@@ -89,6 +89,6 @@ export class ElectionsService {
     if (!existing) throw new NotFoundException('Election not found')
     await this.prisma.election.delete({ where: { id } })
     await this.prisma.auditLog.create({ data: { tableName: 'elections', recordId: id, action: 'DELETE', oldValues: existing, changedBy: adminUserId } })
-    await this.redis.delPattern('elections:*')
+    await this.redis.del('elections:stats', 'stats:platform')
   }
 }

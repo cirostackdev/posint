@@ -68,7 +68,7 @@ export class LegislatureService {
   async createBill(dto: CreateBillDto, adminUserId: string) {
     const bill = await this.prisma.sponsoredBill.create({ data: { ...dto, dateIntroduced: new Date(dto.dateIntroduced), datePassed: dto.datePassed ? new Date(dto.datePassed) : undefined, status: dto.status as any, chamber: dto.chamber as any } })
     await this.prisma.auditLog.create({ data: { tableName: 'sponsored_bills', recordId: bill.id, action: 'INSERT', newValues: bill, changedBy: adminUserId } })
-    await this.redis.delPattern('legislature:*')
+    await this.redis.del('legislature:stats', 'stats:platform')
     await this.pusher.onNewBillIntroduced({ id: bill.id, title: bill.title, sponsor: bill.politicianId, chamber: bill.chamber })
     return bill
   }
@@ -84,7 +84,7 @@ export class LegislatureService {
       await this.pusher.onBillStatusChanged({ id, title: updated.title, oldStatus: existing.status, newStatus: updated.status })
     }
     await this.prisma.auditLog.create({ data: { tableName: 'sponsored_bills', recordId: id, action: 'UPDATE', oldValues: existing, newValues: updated, changedBy: adminUserId } })
-    await this.redis.delPattern('legislature:*')
+    await this.redis.del('legislature:stats', 'stats:platform')
     return updated
   }
 
@@ -93,6 +93,6 @@ export class LegislatureService {
     if (!existing) throw new NotFoundException('Bill not found')
     await this.prisma.sponsoredBill.delete({ where: { id } })
     await this.prisma.auditLog.create({ data: { tableName: 'sponsored_bills', recordId: id, action: 'DELETE', oldValues: existing, changedBy: adminUserId } })
-    await this.redis.delPattern('legislature:*')
+    await this.redis.del('legislature:stats', 'stats:platform')
   }
 }

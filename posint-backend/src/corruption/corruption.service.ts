@@ -111,7 +111,7 @@ export class CorruptionService {
     if (dto.verdictDate) data.verdictDate = new Date(dto.verdictDate)
     const case_ = await this.prisma.corruptionCase.create({ data })
     await this.prisma.auditLog.create({ data: { tableName: 'corruption_cases', recordId: case_.id, action: 'INSERT', newValues: toJsonSafe(case_) as any, changedBy: adminUserId } })
-    await this.redis.delPattern('corruption:*')
+    await this.redis.del('corruption:stats', 'stats:platform')
     return this.serializeCase(case_)
   }
 
@@ -126,7 +126,7 @@ export class CorruptionService {
       await this.pusher.onCaseStatusChanged({ id, politicianName: updated.politicianName, agency: updated.agency, newStatus: updated.status })
     }
     await this.prisma.auditLog.create({ data: { tableName: 'corruption_cases', recordId: id, action: 'UPDATE', oldValues: toJsonSafe(existing) as any, newValues: toJsonSafe(updated) as any, changedBy: adminUserId } })
-    await this.redis.delPattern('corruption:*')
+    await this.redis.del('corruption:stats', 'stats:platform')
     return this.serializeCase(updated)
   }
 
@@ -135,6 +135,6 @@ export class CorruptionService {
     if (!existing) throw new NotFoundException('Case not found')
     await this.prisma.corruptionCase.update({ where: { id }, data: { isActive: false } })
     await this.prisma.auditLog.create({ data: { tableName: 'corruption_cases', recordId: id, action: 'DELETE', oldValues: toJsonSafe(existing) as any, changedBy: adminUserId } })
-    await this.redis.delPattern('corruption:*')
+    await this.redis.del('corruption:stats', 'stats:platform')
   }
 }

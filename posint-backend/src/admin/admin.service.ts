@@ -30,7 +30,7 @@ export class AdminService {
         select: { lastSuccessAt: true },
       }),
     ])
-    return {
+    const result = {
       politicians, parties, elections, bills, billsPassed, cases, activeCases,
       totalRecoveredKobo: recovered._sum.amountRecoveredKobo?.toString() ?? '0',
       constituencyProjects,
@@ -38,6 +38,8 @@ export class AdminService {
       activePipelineJobs: 0,
       lastSyncAt: lastSource?.lastSuccessAt?.toISOString() ?? null,
     }
+    await this.redis.set('stats:platform', result, 900)
+    return result
   }
 
   async getUsers(query: AdminQueryDto) {

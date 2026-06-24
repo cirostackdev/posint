@@ -33,12 +33,12 @@ export class RedisService {
     }
   }
 
-  async del(key: string): Promise<void> {
-    if (!this.redis) return
+  async del(...keys: string[]): Promise<void> {
+    if (!this.redis || keys.length === 0) return
     try {
-      await this.redis.del(key)
+      await this.redis.del(...keys)
     } catch (err) {
-      this.logger.error(`Redis DEL error [${key}]:`, err)
+      this.logger.error(`Redis DEL error [${keys.join(', ')}]:`, err)
     }
   }
 
