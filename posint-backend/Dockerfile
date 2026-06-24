@@ -2,6 +2,16 @@ FROM node:22-alpine AS builder
 
 RUN apk add --no-cache openssl
 
+# Install Playwright/Chromium system dependencies
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    && npx playwright install chromium --with-deps || true
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
