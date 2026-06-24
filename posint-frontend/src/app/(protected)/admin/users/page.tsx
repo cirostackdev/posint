@@ -74,7 +74,7 @@ function UserRow({
     },
   })
 
-  const isActive = (user as AdminUser & { isActive?: boolean }).isActive !== false
+  const isActive = user.isActive !== false
 
   return (
     <tr className="border-b border-border/30 hover:bg-muted/20 transition-colors">
@@ -95,7 +95,7 @@ function UserRow({
         </Badge>
       </td>
       <td className="px-4 py-3 text-xs text-muted-foreground">
-        {relativeTime((user as AdminUser & { lastLoginAt?: string | null }).lastLoginAt ?? null)}
+        {relativeTime(user.lastLoginAt ?? null)}
       </td>
       <td className="px-4 py-3 text-xs text-muted-foreground">
         {new Date(user.createdAt).toLocaleDateString()}
@@ -164,13 +164,13 @@ export default function UsersPage() {
     }, 400)
   }
 
-  const users = (data?.items ?? []).filter((u) => {
+  const users = (data?.data ?? []).filter((u) => {
     if (!debouncedSearch) return true
     const q = debouncedSearch.toLowerCase()
     return u.email.toLowerCase().includes(q) || (u.displayName ?? "").toLowerCase().includes(q)
   })
 
-  const totalPages = data?.totalPages ?? 1
+  const totalPages = data?.meta.totalPages ?? 1
 
   return (
     <div className="space-y-6">
@@ -188,7 +188,7 @@ export default function UsersPage() {
               All Users
               {data && (
                 <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  ({data.total.toLocaleString()} total)
+                  ({data.meta.total.toLocaleString()} total)
                 </span>
               )}
             </CardTitle>

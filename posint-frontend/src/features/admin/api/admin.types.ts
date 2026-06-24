@@ -18,16 +18,21 @@ export interface AdminUser {
   email: string
   displayName: string | null
   role: "USER" | "EDITOR" | "ADMIN"
+  isActive: boolean
   createdAt: string
-  updatedAt: string
+  lastLoginAt: string | null
+}
+
+export interface PaginationMeta {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
 }
 
 export interface AdminUsersResponse {
-  items: AdminUser[]
-  total: number
-  page: number
-  limit: number
-  totalPages: number
+  data: AdminUser[]
+  meta: PaginationMeta
 }
 
 export interface AuditLogEntry {
@@ -42,11 +47,8 @@ export interface AuditLogEntry {
 }
 
 export interface AuditLogResponse {
-  items: AuditLogEntry[]
-  total: number
-  page: number
-  limit: number
-  totalPages: number
+  data: AuditLogEntry[]
+  meta: PaginationMeta
 }
 
 export type DataSourceStatus = "active" | "inactive" | "error" | "unknown"

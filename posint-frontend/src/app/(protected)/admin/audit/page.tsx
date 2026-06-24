@@ -36,8 +36,8 @@ export default function AuditLogPage() {
   const [page, setPage] = useState(1)
   const { data, isLoading } = useAuditLog(page)
 
-  const entries = data?.items ?? []
-  const totalPages = data?.totalPages ?? 1
+  const entries = data?.data ?? []
+  const totalPages = data?.meta.totalPages ?? 1
 
   return (
     <div className="space-y-6">
@@ -54,7 +54,7 @@ export default function AuditLogPage() {
             Events
             {data && (
               <span className="ml-2 text-sm font-normal text-muted-foreground">
-                ({data.total.toLocaleString()} total)
+                ({data.meta.total.toLocaleString()} total)
               </span>
             )}
           </CardTitle>
