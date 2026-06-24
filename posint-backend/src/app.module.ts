@@ -29,6 +29,7 @@ import { ProxyModule } from './pipeline/proxy/proxy.module'
 import { HealthModule } from './health/health.module'
 import { WebhooksModule } from './webhooks/webhooks.module'
 import { ProvenanceModule } from './provenance/provenance.module'
+import { AnalyticsModule } from './analytics/analytics.module'
 
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard'
 import { RolesGuard } from './common/guards/roles.guard'
@@ -73,6 +74,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor'
     HealthModule,
     WebhooksModule,
     ProvenanceModule,
+    AnalyticsModule,
   ],
   providers: [
     // Global guards
