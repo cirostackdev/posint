@@ -8,6 +8,7 @@ import { CreatePoliticianDto } from './dto/create-politician.dto'
 import { UpdatePoliticianDto } from './dto/update-politician.dto'
 import { toJsonSafe } from "../common/utils/json.util"
 import { generateSlug } from '../common/utils/slug.util'
+import { cacheKey } from '../common/utils/cache-key.util'
 
 @Injectable()
 export class PoliticiansService {
@@ -18,10 +19,10 @@ export class PoliticiansService {
   ) {}
 
   async findAll(query: QueryPoliticiansDto) {
-    const cacheKey = `politicians:list:${JSON.stringify(query)}`
+    const key = cacheKey('politicians:list', query as unknown as Record<string, unknown>)
 
     return this.redis.getOrSet(
-      cacheKey,
+      key,
       async () => {
         const where: Prisma.PoliticianWhereInput = {
           isActive: true,

@@ -6,6 +6,7 @@ import { PusherService } from '../pusher/pusher.service'
 import { QueryElectionsDto } from './dto/query-elections.dto'
 import { CreateElectionDto } from './dto/create-election.dto'
 import { UpdateElectionDto } from './dto/update-election.dto'
+import { cacheKey } from '../common/utils/cache-key.util'
 
 @Injectable()
 export class ElectionsService {
@@ -16,8 +17,8 @@ export class ElectionsService {
   ) {}
 
   async findAll(query: QueryElectionsDto) {
-    const cacheKey = `elections:list:${JSON.stringify(query)}`
-    return this.redis.getOrSet(cacheKey, async () => {
+    const key = cacheKey('elections:list', query as unknown as Record<string, unknown>)
+    return this.redis.getOrSet(key, async () => {
       const where: Prisma.ElectionWhereInput = {
         ...(query.level && { level: query.level as any }),
         ...(query.year && { year: query.year }),

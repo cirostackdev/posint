@@ -6,14 +6,15 @@ import { PusherService } from '../pusher/pusher.service'
 import { QueryBillsDto } from './dto/query-bills.dto'
 import { CreateBillDto } from './dto/create-bill.dto'
 import { UpdateBillDto } from './dto/update-bill.dto'
+import { cacheKey } from '../common/utils/cache-key.util'
 
 @Injectable()
 export class LegislatureService {
   constructor(private prisma: PrismaService, private redis: RedisService, private pusher: PusherService) {}
 
   async findAllBills(query: QueryBillsDto) {
-    const cacheKey = `legislature:list:${JSON.stringify(query)}`
-    return this.redis.getOrSet(cacheKey, async () => {
+    const key = cacheKey('legislature:list', query as unknown as Record<string, unknown>)
+    return this.redis.getOrSet(key, async () => {
       const where: Prisma.SponsoredBillWhereInput = {
         ...(query.status && { status: query.status as any }),
         ...(query.chamber && { chamber: query.chamber as any }),

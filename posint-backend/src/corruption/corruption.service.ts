@@ -7,6 +7,7 @@ import { QueryCasesDto } from './dto/query-cases.dto'
 import { CreateCaseDto } from './dto/create-case.dto'
 import { UpdateCaseDto } from './dto/update-case.dto'
 import { toJsonSafe } from '../common/utils/json.util'
+import { cacheKey } from '../common/utils/cache-key.util'
 
 @Injectable()
 export class CorruptionService {
@@ -21,8 +22,8 @@ export class CorruptionService {
   }
 
   async findAll(query: QueryCasesDto) {
-    const cacheKey = `corruption:list:${JSON.stringify(query)}`
-    return this.redis.getOrSet(cacheKey, async () => {
+    const key = cacheKey('corruption:list', query as unknown as Record<string, unknown>)
+    return this.redis.getOrSet(key, async () => {
       const where: Prisma.CorruptionCaseWhereInput = {
         isActive: true,
         ...(query.agency && { agency: query.agency as any }),
