@@ -12,6 +12,7 @@ export class PipelineService {
     @InjectQueue(QUEUE_NAMES.SCRAPE_NASS) private nassQueue: Queue,
     @InjectQueue(QUEUE_NAMES.SCRAPE_EFCC) private efccQueue: Queue,
     @InjectQueue(QUEUE_NAMES.FETCH_SOCIAL) private socialQueue: Queue,
+    @InjectQueue(QUEUE_NAMES.FETCH_NEWS) private newsQueue: Queue,
     @InjectQueue(QUEUE_NAMES.COMPUTE_SENTIMENT) private sentimentQueue: Queue,
     @InjectQueue(QUEUE_NAMES.COMPUTE_STATS) private statsQueue: Queue,
     @InjectQueue(QUEUE_NAMES.CLEANUP) private cleanupQueue: Queue,
@@ -34,6 +35,11 @@ export class PipelineService {
   @Cron(CronExpression.EVERY_HOUR)
   async scheduleSocialFetch() {
     await this.socialQueue.add('fetch', {}, { jobId: `social-${Date.now()}` })
+  }
+
+  @Cron('0 */2 * * *') // Every 2 hours
+  async scheduleNewsFetch() {
+    await this.newsQueue.add('fetch', {}, { jobId: `news-${Date.now()}` })
   }
 
   @Cron('*/15 * * * *')
@@ -70,6 +76,11 @@ export class PipelineService {
   async triggerSocial(targetId?: string) {
     const job = await this.socialQueue.add('fetch', { manual: true, targetId }, { priority: 1 })
     return { jobId: job.id, queue: QUEUE_NAMES.FETCH_SOCIAL }
+  }
+
+  async triggerNews() {
+    const job = await this.newsQueue.add('fetch', { manual: true }, { priority: 1 })
+    return { jobId: job.id, queue: QUEUE_NAMES.FETCH_NEWS }
   }
 
   async triggerSentiment() {

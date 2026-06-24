@@ -13,6 +13,8 @@ import { ReconcileProcessor } from './processors/reconcile.processor'
 import { NassScraper } from './scrapers/nass.scraper'
 import { EfccScraper } from './scrapers/efcc.scraper'
 import { InecScraper } from './scrapers/inec.scraper'
+import { NewsRssScraper } from './scrapers/news-rss.scraper'
+import { NewsProcessor } from './processors/news.processor'
 import { AiService } from '../services/ai.service'
 import { QUEUE_NAMES } from './pipeline.constants'
 
@@ -43,6 +45,7 @@ export { QUEUE_NAMES }
       { name: QUEUE_NAMES.SCRAPE_EFCC },
       { name: QUEUE_NAMES.SCRAPE_INEC },
       { name: QUEUE_NAMES.FETCH_SOCIAL },
+      { name: QUEUE_NAMES.FETCH_NEWS },
       { name: QUEUE_NAMES.COMPUTE_SENTIMENT },
       { name: QUEUE_NAMES.COMPUTE_STATS },
       { name: QUEUE_NAMES.WARM_CACHE },
@@ -62,6 +65,8 @@ export { QUEUE_NAMES }
     NassScraper,
     EfccScraper,
     InecScraper,
+    NewsRssScraper,
+    NewsProcessor,
     AiService,
   ],
   exports: [PipelineService],

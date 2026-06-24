@@ -3,6 +3,7 @@ export const QUEUE_NAMES = {
   SCRAPE_EFCC: 'scrape-efcc',
   SCRAPE_INEC: 'scrape-inec',
   FETCH_SOCIAL: 'fetch-social',
+  FETCH_NEWS: 'fetch-news',
   COMPUTE_SENTIMENT: 'compute-sentiment',
   COMPUTE_STATS: 'compute-stats',
   WARM_CACHE: 'warm-cache',
