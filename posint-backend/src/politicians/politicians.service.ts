@@ -95,7 +95,13 @@ export class PoliticiansService {
         })
 
         if (!politician) throw new NotFoundException('Politician not found')
-        return politician
+
+        const corruptionCases = await this.prisma.corruptionCase.count({
+          where: { politicianId: politician.id, isActive: true },
+        })
+
+        const { contacts, ...safeFields } = politician
+        return { ...safeFields, corruptionCases }
       },
       3600,
     )
