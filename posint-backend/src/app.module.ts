@@ -47,6 +47,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor'
       { name: 'short', ttl: 1000, limit: 10 },
       { name: 'medium', ttl: 60000, limit: 100 },
       { name: 'long', ttl: 3600000, limit: 1000 },
+      { name: 'auth', ttl: 60000, limit: 100 },  // Auth endpoints use this; overridden per-route
     ]),
 
     // Infrastructure (global)
