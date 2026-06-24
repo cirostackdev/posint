@@ -59,8 +59,8 @@ export interface DataSource {
   type: string
   url: string | null
   status: DataSourceStatus
-  lastCheckedAt: string | null
-  errorMessage: string | null
+  lastSuccessAt: string | null
+  errorCount: number
   createdAt: string
   updatedAt: string
 }

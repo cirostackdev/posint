@@ -75,10 +75,10 @@ export function DataSources() {
                       Status
                     </th>
                     <th className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Last Checked
+                      Last Success
                     </th>
                     <th className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Error
+                      Errors
                     </th>
                   </tr>
                 </thead>
@@ -117,15 +117,13 @@ export function DataSources() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-xs text-muted-foreground">
-                          {source.lastCheckedAt
-                            ? new Date(source.lastCheckedAt).toLocaleString()
+                          {source.lastSuccessAt
+                            ? new Date(source.lastSuccessAt).toLocaleString()
                             : "—"}
                         </td>
-                        <td className="px-4 py-3 text-xs text-red-400 max-w-[200px]">
-                          {source.errorMessage ? (
-                            <span className="truncate block" title={source.errorMessage}>
-                              {source.errorMessage}
-                            </span>
+                        <td className="px-4 py-3 text-xs max-w-[200px]">
+                          {source.errorCount > 0 ? (
+                            <span className="text-red-400">{source.errorCount} errors</span>
                           ) : (
                             <span className="text-muted-foreground">—</span>
                           )}

@@ -57,11 +57,6 @@ export function ElectionsPage() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "N/A"
   }, [elections])
 
-  // Election types derived from current result set
-  const electionTypes = useMemo(() => {
-    return [...new Set(elections.map((e) => e.type))].sort()
-  }, [elections])
-
   // Available LGAs for selected state (client-side from loaded data)
   const availableLGAs = useMemo(() => {
     if (!state) return []
@@ -89,9 +84,6 @@ export function ElectionsPage() {
       key: "year",
       options: YEARS.map((y) => ({ value: y, label: y })),
     },
-    ...(electionTypes.length > 0
-      ? [{ label: "Type", key: "type", options: electionTypes.map((t) => ({ value: t, label: t })) }]
-      : []),
     ...(level !== "FEDERAL"
       ? [{ label: "State", key: "state", options: NIGERIAN_STATES.map((s) => ({ value: s, label: s })) }]
       : []),
