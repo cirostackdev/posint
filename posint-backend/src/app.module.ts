@@ -25,6 +25,7 @@ import { SocialModule } from './social/social.module'
 import { SearchModule } from './search/search.module'
 import { AdminModule } from './admin/admin.module'
 import { PipelineModule } from './pipeline/pipeline.module'
+import { ProxyModule } from './pipeline/proxy/proxy.module'
 import { HealthModule } from './health/health.module'
 import { WebhooksModule } from './webhooks/webhooks.module'
 import { ProvenanceModule } from './provenance/provenance.module'
@@ -68,6 +69,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor'
     SearchModule,
     AdminModule,
     PipelineModule,
+    ProxyModule,
     HealthModule,
     WebhooksModule,
     ProvenanceModule,
