@@ -3,6 +3,7 @@ import { Logger } from '@nestjs/common'
 import { Job } from 'bullmq'
 import { PrismaService } from '../../prisma/prisma.service'
 import { PusherService } from '../../pusher/pusher.service'
+import { ProvenanceService } from '../../provenance/provenance.service'
 import { NassPlaywrightScraper, NassScrapedBill } from '../scrapers/nass-playwright.scraper'
 import { QUEUE_NAMES } from '../pipeline.constants'
 
@@ -16,6 +17,7 @@ export class NassProcessor extends WorkerHost {
     private prisma: PrismaService,
     private pusher: PusherService,
     private nassScraper: NassPlaywrightScraper,
+    private provenance: ProvenanceService,
   ) {
     super()
   }
@@ -91,6 +93,15 @@ export class NassProcessor extends WorkerHost {
         data: { politicianId: politician.id, title: raw.title, status, chamber, dateIntroduced: date, sourceUrl: raw.sourceUrl },
       })
       await this.pusher.onNewBillIntroduced({ id: bill.id, title: bill.title, sponsor: raw.sponsorName, chamber: bill.chamber })
+      // Link the bill to its source evidence
+      await this.provenance.linkFact({
+        entityType: 'bill',
+        entityId: bill.id,
+        sourceRecordId: raw.sourceRecordId,
+        extractionMethod: 'playwright_nass',
+        extractedText: raw.title,
+        confidence: 0.80,
+      })
     }
     return true
   }
