@@ -49,4 +49,19 @@ describe('ConfidenceService', () => {
       expect(result).toBe(0.7)
     })
   })
+
+  describe('shouldFlagForReview', () => {
+    it('returns false when fewer than 2 confidences', () => {
+      expect(service.shouldFlagForReview([])).toBe(false)
+      expect(service.shouldFlagForReview([0.8])).toBe(false)
+    })
+
+    it('returns true when spread exceeds 0.3', () => {
+      expect(service.shouldFlagForReview([0.9, 0.5])).toBe(true)  // spread = 0.4
+    })
+
+    it('returns false when spread is within tolerance', () => {
+      expect(service.shouldFlagForReview([0.8, 0.6])).toBe(false)  // spread = 0.2
+    })
+  })
 })
