@@ -18,6 +18,7 @@ describe('PoliticiansService', () => {
       count: jest.fn(),
       groupBy: jest.fn(),
     },
+    corruptionCase: { count: jest.fn().mockResolvedValue(0) },
     auditLog: { create: jest.fn() },
     votingRecord: { findMany: jest.fn() },
     sponsoredBill: { findMany: jest.fn() },
