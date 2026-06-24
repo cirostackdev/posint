@@ -1,6 +1,21 @@
 import { PrismaClient } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 
+// ─── Production Guard ─────────────────────────────────────────
+// SAFETY: Never run seed against production
+if (process.env.NODE_ENV === 'production') {
+  console.error('❌ FATAL: Cannot run seed script in production environment.')
+  console.error('   Set NODE_ENV=development to seed the dev database.')
+  process.exit(1)
+}
+
+if (process.env.DATABASE_URL?.includes('neon.tech') && !process.env.SEED_CONFIRM) {
+  console.error('⚠️  WARNING: DATABASE_URL points to a Neon (cloud) database.')
+  console.error('   If seeding cloud DB is intentional, set SEED_CONFIRM=yes')
+  console.error('   Example: SEED_CONFIRM=yes npx prisma db seed')
+  process.exit(1)
+}
+
 const prisma = new PrismaClient()
 
 // ─────────────────────────────────────────────────────────────
@@ -46,11 +61,17 @@ async function main() {
   // ═══════════════════════════════════════════════════════════
   // USERS
   // ═══════════════════════════════════════════════════════════
-  const adminHash = await bcrypt.hash('Admin@123!', 12)
-  const editorHash = await bcrypt.hash('Editor@123!', 12)
+  // Generate unique passwords per seed run (not hardcoded)
+  const { randomBytes } = await import('crypto')
+  const adminPassword = `Admin-${randomBytes(8).toString('hex')}!`
+  const editorPassword = `Editor-${randomBytes(8).toString('hex')}!`
+  const adminHash = await bcrypt.hash(adminPassword, 12)
+  const editorHash = await bcrypt.hash(editorPassword, 12)
   await prisma.user.upsert({ where: { email: 'admin@posint.ng' }, update: {}, create: { email: 'admin@posint.ng', passwordHash: adminHash, displayName: 'POSINT Admin', role: 'ADMIN' } })
   await prisma.user.upsert({ where: { email: 'editor@posint.ng' }, update: {}, create: { email: 'editor@posint.ng', passwordHash: editorHash, displayName: 'POSINT Editor', role: 'EDITOR' } })
   console.log('✅  Users')
+  console.log(`   Admin:  admin@posint.ng / ${adminPassword}`)
+  console.log(`   Editor: editor@posint.ng / ${editorPassword}`)
 
   // ═══════════════════════════════════════════════════════════
   // DATA SOURCES
