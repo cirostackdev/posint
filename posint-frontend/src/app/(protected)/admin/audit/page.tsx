@@ -106,19 +106,25 @@ export default function AuditLogPage() {
                           </Badge>
                         </td>
                         <td className="px-4 py-3 text-sm text-foreground font-mono">
-                          {entry.resource}
+                          {entry.tableName}
                         </td>
                         <td className="px-4 py-3 text-xs text-muted-foreground font-mono">
-                          {entry.resourceId ? (
-                            <span title={entry.resourceId}>
-                              {entry.resourceId.slice(0, 12)}…
+                          {entry.recordId ? (
+                            <span title={entry.recordId}>
+                              {entry.recordId.slice(0, 12)}…
                             </span>
                           ) : (
                             "—"
                           )}
                         </td>
-                        <td className="px-4 py-3 text-xs text-muted-foreground">
-                          {entry.userEmail ?? entry.userId ?? "system"}
+                        <td className="px-4 py-3 text-xs text-muted-foreground font-mono">
+                          {entry.changedBy ? (
+                            <span title={entry.changedBy}>
+                              {entry.changedBy.slice(0, 8)}…
+                            </span>
+                          ) : (
+                            "system"
+                          )}
                         </td>
                       </tr>
                     ))

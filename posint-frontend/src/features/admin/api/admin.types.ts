@@ -37,12 +37,12 @@ export interface AdminUsersResponse {
 
 export interface AuditLogEntry {
   id: string
-  userId: string | null
-  userEmail: string | null
-  action: string
-  resource: string
-  resourceId: string | null
-  details: Record<string, unknown> | null
+  tableName: string
+  recordId: string
+  action: string          // 'INSERT' | 'UPDATE' | 'DELETE'
+  oldValues: Record<string, unknown> | null
+  newValues: Record<string, unknown> | null
+  changedBy: string       // admin user UUID
   createdAt: string
 }
 
