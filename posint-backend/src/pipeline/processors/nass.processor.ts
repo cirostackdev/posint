@@ -3,7 +3,7 @@ import { Logger } from '@nestjs/common'
 import { Job } from 'bullmq'
 import { PrismaService } from '../../prisma/prisma.service'
 import { PusherService } from '../../pusher/pusher.service'
-import { NassScraper, ScrapedBill } from '../scrapers/nass.scraper'
+import { NassPlaywrightScraper, NassScrapedBill } from '../scrapers/nass-playwright.scraper'
 import { QUEUE_NAMES } from '../pipeline.constants'
 
 @Processor(QUEUE_NAMES.SCRAPE_NASS, {
@@ -15,7 +15,7 @@ export class NassProcessor extends WorkerHost {
   constructor(
     private prisma: PrismaService,
     private pusher: PusherService,
-    private nassScraper: NassScraper,
+    private nassScraper: NassPlaywrightScraper,
   ) {
     super()
   }
@@ -32,7 +32,7 @@ export class NassProcessor extends WorkerHost {
         })
       }
 
-      const bills = await this.nassScraper.scrapeBills()
+      const bills = await this.nassScraper.scrape()
       this.logger.log(`Scraped ${bills.length} bills from NASS`)
 
       let processed = 0
@@ -63,7 +63,7 @@ export class NassProcessor extends WorkerHost {
     }
   }
 
-  private async upsertBill(raw: ScrapedBill): Promise<boolean> {
+  private async upsertBill(raw: NassScrapedBill): Promise<boolean> {
     const politician = await this.prisma.politician.findFirst({
       where: { name: { contains: raw.sponsorName, mode: 'insensitive' } },
       select: { id: true },
