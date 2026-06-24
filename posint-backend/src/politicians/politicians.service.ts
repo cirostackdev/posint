@@ -8,7 +8,7 @@ import { CreatePoliticianDto } from './dto/create-politician.dto'
 import { UpdatePoliticianDto } from './dto/update-politician.dto'
 import { toJsonSafe } from "../common/utils/json.util"
 import { generateSlug } from '../common/utils/slug.util'
-import { cacheKey } from '../common/utils/cache-key.util'
+import { cacheKey as makeCacheKey } from '../common/utils/cache-key.util'
 
 @Injectable()
 export class PoliticiansService {
@@ -19,7 +19,7 @@ export class PoliticiansService {
   ) {}
 
   async findAll(query: QueryPoliticiansDto) {
-    const key = cacheKey('politicians:list', query as unknown as Record<string, unknown>)
+    const key = makeCacheKey('politicians:list', query as unknown as Record<string, unknown>)
 
     return this.redis.getOrSet(
       key,
