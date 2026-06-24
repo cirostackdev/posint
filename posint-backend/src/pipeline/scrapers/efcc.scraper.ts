@@ -1,15 +1,21 @@
 import { Injectable } from '@nestjs/common'
 import { BaseScraper } from './base.scraper'
+import { ProvenanceService } from '../../provenance/provenance.service'
 
 export interface ScrapedCase {
   politicianName: string
   charges: string
   description: string
   sourceUrl: string
+  sourceRecordId: string
 }
 
 @Injectable()
 export class EfccScraper extends BaseScraper {
+  constructor(provenance: ProvenanceService) {
+    super(provenance)
+  }
+
   async scrape(): Promise<ScrapedCase[]> {
     return this.scrapePresseReleases()
   }
@@ -18,7 +24,7 @@ export class EfccScraper extends BaseScraper {
     const results: ScrapedCase[] = []
 
     try {
-      const html = await this.fetchHtml('https://efcc.gov.ng/news')
+      const { html, sourceRecordId } = await this.fetchAndRecord('https://efcc.gov.ng/news')
       const $ = this.parseHtml(html)
 
       $('article, .news-item, .press-release').each((_, item) => {
@@ -32,6 +38,7 @@ export class EfccScraper extends BaseScraper {
             charges: title,
             description,
             sourceUrl: link || 'https://efcc.gov.ng/news',
+            sourceRecordId,
           })
         }
       })

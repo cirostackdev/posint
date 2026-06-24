@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { BaseScraper } from './base.scraper'
+import { ProvenanceService } from '../../provenance/provenance.service'
 
 export interface ScrapedBill {
   title: string
@@ -8,10 +9,15 @@ export interface ScrapedBill {
   chamber: string
   dateIntroduced: string
   sourceUrl: string | null
+  sourceRecordId: string
 }
 
 @Injectable()
 export class NassScraper extends BaseScraper {
+  constructor(provenance: ProvenanceService) {
+    super(provenance)
+  }
+
   async scrape(): Promise<ScrapedBill[]> {
     return this.scrapeBills()
   }
@@ -20,7 +26,7 @@ export class NassScraper extends BaseScraper {
     const results: ScrapedBill[] = []
 
     try {
-      const html = await this.fetchHtml('https://nass.gov.ng/documents/bills')
+      const { html, sourceRecordId } = await this.fetchAndRecord('https://nass.gov.ng/documents/bills')
       const $ = this.parseHtml(html)
 
       $('table.bills-table tbody tr').each((_, row) => {
@@ -40,6 +46,7 @@ export class NassScraper extends BaseScraper {
             chamber,
             dateIntroduced: dateStr,
             sourceUrl: link ? `https://nass.gov.ng${link}` : null,
+            sourceRecordId,
           })
         }
       })
