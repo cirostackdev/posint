@@ -16,6 +16,7 @@ import { EfccPlaywrightScraper } from './scrapers/efcc-playwright.scraper'
 import { InecScraper } from './scrapers/inec.scraper'
 import { NewsRssScraper } from './scrapers/news-rss.scraper'
 import { NewsProcessor } from './processors/news.processor'
+import { AnomalyProcessor } from './processors/anomaly.processor'
 import { AiService } from '../services/ai.service'
 import { QUEUE_NAMES } from './pipeline.constants'
 
@@ -52,6 +53,7 @@ export { QUEUE_NAMES }
       { name: QUEUE_NAMES.WARM_CACHE },
       { name: QUEUE_NAMES.CLEANUP },
       { name: QUEUE_NAMES.RECONCILE_COUNTERS },
+      { name: QUEUE_NAMES.SCAN_ANOMALIES },
     ),
   ],
   controllers: [PipelineController],
@@ -69,6 +71,7 @@ export { QUEUE_NAMES }
     InecScraper,
     NewsRssScraper,
     NewsProcessor,
+    AnomalyProcessor,
     AiService,
   ],
   exports: [PipelineService],

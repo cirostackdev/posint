@@ -9,4 +9,5 @@ export const QUEUE_NAMES = {
   WARM_CACHE: 'warm-cache',
   CLEANUP: 'cleanup',
   RECONCILE_COUNTERS: 'reconcile-counters',
+  SCAN_ANOMALIES: 'scan-anomalies',
 } as const

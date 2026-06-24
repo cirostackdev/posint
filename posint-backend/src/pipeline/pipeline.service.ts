@@ -24,6 +24,7 @@ export class PipelineService {
     @InjectQueue(QUEUE_NAMES.COMPUTE_STATS) private statsQueue: Queue,
     @InjectQueue(QUEUE_NAMES.CLEANUP) private cleanupQueue: Queue,
     @InjectQueue(QUEUE_NAMES.RECONCILE_COUNTERS) private reconcileQueue: Queue,
+    @InjectQueue(QUEUE_NAMES.SCAN_ANOMALIES) private anomalyQueue: Queue,
   ) {}
 
   // ─── Scheduled Jobs ─────────────────────────────────────
@@ -62,6 +63,11 @@ export class PipelineService {
   @Cron('0 4 * * *') // Daily at 4am, after NASS scrape
   async scheduleReconcile() {
     await this.reconcileQueue.add('reconcile', {}, { jobId: `reconcile-${Date.now()}`, ...this.defaultJobOptions })
+  }
+
+  @Cron('0 2 * * *') // Daily at 2am
+  async scheduleAnomalyScan() {
+    await this.anomalyQueue.add('scan', {}, { jobId: `anomaly-${Date.now()}`, ...this.defaultJobOptions })
   }
 
   // ─── Manual Triggers ────────────────────────────────────
@@ -103,6 +109,11 @@ export class PipelineService {
   async triggerReconcile() {
     const job = await this.reconcileQueue.add('reconcile', { manual: true }, { priority: 1, ...this.defaultJobOptions })
     return { jobId: job.id, queue: QUEUE_NAMES.RECONCILE_COUNTERS }
+  }
+
+  async triggerAnomalyScan() {
+    const job = await this.anomalyQueue.add('scan', { manual: true }, { priority: 1, ...this.defaultJobOptions })
+    return { jobId: job.id, queue: QUEUE_NAMES.SCAN_ANOMALIES }
   }
 
   async getJobsStatus() {
