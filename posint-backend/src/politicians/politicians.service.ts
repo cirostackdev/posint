@@ -271,7 +271,7 @@ export class PoliticiansService {
     })
 
     await this.writeAuditLog('politicians', id, 'UPDATE', existing, updated, adminUserId)
-    await this.redis.del('politicians:stats', 'stats:platform')
+    await this.redis.del('politicians:stats', 'stats:platform', `politicians:slug:${updated.slug}`)
     await this.pusher.onPoliticianUpdated({ id, slug: updated.slug })
 
     return updated
@@ -283,7 +283,7 @@ export class PoliticiansService {
 
     await this.prisma.politician.update({ where: { id }, data: { isActive: false } })
     await this.writeAuditLog('politicians', id, 'DELETE', existing, null, adminUserId)
-    await this.redis.del('politicians:stats', 'stats:platform')
+    await this.redis.del('politicians:stats', 'stats:platform', `politicians:slug:${existing.slug}`)
   }
 
   private async writeAuditLog(
