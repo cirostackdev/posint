@@ -21,17 +21,17 @@ enum UserRole {
 }
 
 model User {
-  id             String    @id @default(uuid()) @db.Uuid
-  email          String    @unique
-  passwordHash   String    @map("password_hash")
-  displayName    String?   @map("display_name")
-  role           UserRole  @default(USER)
-  avatarUrl      String?   @map("avatar_url")
-  isActive       Boolean   @default(true) @map("is_active")
-  refreshToken   String?   @map("refresh_token")
-  lastLoginAt    DateTime? @map("last_login_at")
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  displayName  String?   @map("display_name")
+  role         UserRole  @default(USER)
+  avatarUrl    String?   @map("avatar_url")
+  isActive     Boolean   @default(true) @map("is_active")
+  refreshToken String?   @map("refresh_token")
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
 
   watchlist UserWatchlist[]
 
@@ -120,7 +120,7 @@ model Politician {
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
 
-  party                PoliticalParty?       @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  party                PoliticalParty?        @relation(fields: [partyId], references: [id], onDelete: SetNull)
   contacts             PoliticianContact?
   votingRecords        VotingRecord[]
   sponsoredBills       SponsoredBill[]
@@ -388,7 +388,7 @@ model Election {
   createdAt        DateTime      @default(now()) @map("created_at")
   updatedAt        DateTime      @updatedAt @map("updated_at")
 
-  winnerParty PoliticalParty?    @relation(fields: [winnerPartyId], references: [id])
+  winnerParty PoliticalParty?     @relation(fields: [winnerPartyId], references: [id])
   candidates  ElectionCandidate[]
 
   @@index([year(sort: Desc)])
@@ -557,6 +557,8 @@ model DataSource {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
+  sourceRecords SourceRecord[]
+
   @@map("data_sources")
 }
 
@@ -574,4 +576,67 @@ model AuditLog {
   @@index([recordId])
   @@index([createdAt(sort: Desc)])
   @@map("audit_log")
+}
+
+// ══════════════════════════════════════════════════════════════
+// PROVENANCE & INTELLIGENCE
+// ══════════════════════════════════════════════════════════════
+
+model SourceRecord {
+  id              String    @id @default(uuid()) @db.Uuid
+  url             String
+  contentHash     String    @map("content_hash")
+  contentType     String    @map("content_type")
+  archiveUrl      String?   @map("archive_url")
+  rawContent      String?   @map("raw_content") @db.Text
+  httpStatus      Int?      @map("http_status")
+  responseHeaders Json?     @map("response_headers")
+  sourceId        String?   @map("source_id") @db.Uuid
+  scrapeJobId     String?   @map("scrape_job_id")
+  verifiedAt      DateTime? @map("verified_at")
+  deadSince       DateTime? @map("dead_since")
+  archivedAt      DateTime  @default(now()) @map("archived_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  source    DataSource?  @relation(fields: [sourceId], references: [id])
+  factLinks FactSource[]
+
+  @@index([url])
+  @@index([contentHash])
+  @@index([sourceId])
+  @@map("source_records")
+}
+
+model FactSource {
+  id               String   @id @default(uuid()) @db.Uuid
+  entityType       String   @map("entity_type")
+  entityId         String   @map("entity_id") @db.Uuid
+  fieldName        String?  @map("field_name")
+  sourceRecordId   String   @map("source_record_id") @db.Uuid
+  extractionMethod String?  @map("extraction_method")
+  extractedText    String?  @map("extracted_text") @db.Text
+  confidence       Decimal? @db.Decimal(4, 3)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  sourceRecord SourceRecord @relation(fields: [sourceRecordId], references: [id], onDelete: Cascade)
+
+  @@index([entityType, entityId])
+  @@index([sourceRecordId])
+  @@map("fact_sources")
+}
+
+model FactHistory {
+  id             String   @id @default(uuid()) @db.Uuid
+  entityType     String   @map("entity_type")
+  entityId       String   @map("entity_id") @db.Uuid
+  fieldName      String   @map("field_name")
+  oldValue       String?  @map("old_value") @db.Text
+  newValue       String   @map("new_value") @db.Text
+  sourceRecordId String?  @map("source_record_id") @db.Uuid
+  changeReason   String?  @map("change_reason")
+  changedAt      DateTime @default(now()) @map("changed_at")
+
+  @@index([entityType, entityId])
+  @@index([changedAt(sort: Desc)])
+  @@map("fact_history")
 }
