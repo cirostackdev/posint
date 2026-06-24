@@ -52,7 +52,7 @@ export class CorruptionService {
           this.prisma.corruptionCase.count({ where: { isActive: true, status: 'CONVICTED' } }),
           this.prisma.corruptionCase.count({ where: { isActive: true, status: 'ACQUITTED' } }),
           this.prisma.corruptionCase.count({ where: { isActive: true, status: { in: ['UNDER_INVESTIGATION', 'ONGOING'] } } }),
-          this.prisma.corruptionCase.aggregate({ _sum: { amountRecoveredKobo: true } }),
+          this.prisma.corruptionCase.aggregate({ where: { isActive: true }, _sum: { amountRecoveredKobo: true } }),
           this.prisma.$queryRaw<Array<{ year: bigint; cases: bigint; convictions: bigint }>>`
             SELECT
               EXTRACT(YEAR FROM filing_date)::bigint AS year,
@@ -116,7 +116,7 @@ export class CorruptionService {
   }
 
   async update(id: string, dto: UpdateCaseDto, adminUserId: string) {
-    const existing = await this.prisma.corruptionCase.findUnique({ where: { id } })
+    const existing = await this.prisma.corruptionCase.findFirst({ where: { id, isActive: true } })
     if (!existing) throw new NotFoundException('Case not found')
     const data: any = { ...dto }
     if (dto.filingDate) data.filingDate = new Date(dto.filingDate)
