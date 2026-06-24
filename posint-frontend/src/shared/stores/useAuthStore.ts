@@ -17,6 +17,18 @@ interface AuthState {
   clearAuth: () => void
 }
 
+function syncCookie(token: string | null) {
+  if (typeof document === "undefined") return
+  if (token) {
+    // Set a non-httpOnly cookie readable by Next.js middleware
+    // Expires in 7 days (matches refresh token lifetime)
+    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString()
+    document.cookie = `posint-access=${token}; path=/; expires=${expires}; SameSite=Lax`
+  } else {
+    document.cookie = "posint-access=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+  }
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -24,10 +36,14 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
-      setAuth: (user, accessToken, refreshToken) =>
-        set({ user, accessToken, refreshToken, isAuthenticated: true }),
-      clearAuth: () =>
-        set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false }),
+      setAuth: (user, accessToken, refreshToken) => {
+        syncCookie(accessToken)
+        set({ user, accessToken, refreshToken, isAuthenticated: true })
+      },
+      clearAuth: () => {
+        syncCookie(null)
+        set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false })
+      },
     }),
     {
       name: "posint-auth",
