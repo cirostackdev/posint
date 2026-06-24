@@ -27,11 +27,11 @@ export class ReconcileProcessor extends WorkerHost {
     let updated = 0
     for (const row of billCounts) {
       const count = Number(row.count)
-      await this.prisma.politician.updateMany({
+      const result = await this.prisma.politician.updateMany({
         where: { id: row.id, billsSponsored: { not: count } },
         data: { billsSponsored: count },
       })
-      updated++
+      if (result.count > 0) updated++
     }
 
     // Reconcile attendance_rate
@@ -50,14 +50,16 @@ export class ReconcileProcessor extends WorkerHost {
       GROUP BY p.id
     `
 
+    let attendanceUpdated = 0
     for (const row of attendanceRates) {
-      await this.prisma.politician.updateMany({
-        where: { id: row.id },
+      const result = await this.prisma.politician.updateMany({
+        where: { id: row.id, attendanceRate: { not: row.rate as any } },
         data: { attendanceRate: row.rate },
       })
+      if (result.count > 0) attendanceUpdated++
     }
 
-    this.logger.log(`Reconciled counters for ${updated} politicians`)
-    return { reconciled: updated }
+    this.logger.log(`Reconciled: ${updated} bill counts, ${attendanceUpdated} attendance rates`)
+    return { billsReconciled: updated, attendanceReconciled: attendanceUpdated }
   }
 }
