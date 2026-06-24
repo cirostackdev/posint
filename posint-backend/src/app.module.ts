@@ -27,6 +27,7 @@ import { AdminModule } from './admin/admin.module'
 import { PipelineModule } from './pipeline/pipeline.module'
 import { HealthModule } from './health/health.module'
 import { WebhooksModule } from './webhooks/webhooks.module'
+import { ProvenanceModule } from './provenance/provenance.module'
 
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard'
 import { RolesGuard } from './common/guards/roles.guard'
@@ -69,6 +70,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor'
     PipelineModule,
     HealthModule,
     WebhooksModule,
+    ProvenanceModule,
   ],
   providers: [
     // Global guards
