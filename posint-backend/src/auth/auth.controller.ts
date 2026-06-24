@@ -7,6 +7,7 @@ import { RefreshDto } from './dto/refresh.dto'
 import { Public } from '../common/decorators/public.decorator'
 import { CurrentUser } from '../common/decorators/current-user.decorator'
 import { JwtPayload } from './strategies/jwt.strategy'
+import { ThrottleLogin, ThrottleSignup, ThrottleRefresh } from '../common/decorators/throttle-auth.decorator'
 
 @ApiTags('Auth')
 @Controller({ path: 'auth', version: '1' })
@@ -15,6 +16,7 @@ export class AuthController {
 
   @Post('signup')
   @Public()
+  @ThrottleSignup()
   @ApiOperation({ summary: 'Create a new user account' })
   signup(@Body() dto: SignupDto) {
     return this.authService.signup(dto)
@@ -22,6 +24,7 @@ export class AuthController {
 
   @Post('login')
   @Public()
+  @ThrottleLogin()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Authenticate and receive tokens' })
   login(@Body() dto: LoginDto) {
@@ -30,6 +33,7 @@ export class AuthController {
 
   @Post('refresh')
   @Public()
+  @ThrottleRefresh()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access token' })
   refresh(@Body() dto: RefreshDto) {
