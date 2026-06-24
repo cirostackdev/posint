@@ -8,6 +8,13 @@ import { QUEUE_NAMES } from './pipeline.constants'
 export class PipelineService {
   private readonly logger = new Logger(PipelineService.name)
 
+  private readonly defaultJobOptions = {
+    attempts: 5,
+    backoff: { type: 'exponential' as const, delay: 60000 },
+    removeOnComplete: { age: 86400, count: 100 },
+    removeOnFail: false, // Keep failures in queue for inspection
+  }
+
   constructor(
     @InjectQueue(QUEUE_NAMES.SCRAPE_NASS) private nassQueue: Queue,
     @InjectQueue(QUEUE_NAMES.SCRAPE_EFCC) private efccQueue: Queue,
@@ -24,48 +31,48 @@ export class PipelineService {
   @Cron('0 6 * * *')
   async scheduleNassScrape() {
     this.logger.log('Scheduling NASS scrape')
-    await this.nassQueue.add('scrape', {}, { jobId: `nass-${Date.now()}` })
+    await this.nassQueue.add('scrape', {}, { jobId: `nass-${Date.now()}`, ...this.defaultJobOptions })
   }
 
   @Cron('0 */6 * * *')
   async scheduleEfccScrape() {
-    await this.efccQueue.add('scrape', {}, { jobId: `efcc-${Date.now()}` })
+    await this.efccQueue.add('scrape', {}, { jobId: `efcc-${Date.now()}`, ...this.defaultJobOptions })
   }
 
   @Cron(CronExpression.EVERY_HOUR)
   async scheduleSocialFetch() {
-    await this.socialQueue.add('fetch', {}, { jobId: `social-${Date.now()}` })
+    await this.socialQueue.add('fetch', {}, { jobId: `social-${Date.now()}`, ...this.defaultJobOptions })
   }
 
   @Cron('0 */2 * * *') // Every 2 hours
   async scheduleNewsFetch() {
-    await this.newsQueue.add('fetch', {}, { jobId: `news-${Date.now()}` })
+    await this.newsQueue.add('fetch', {}, { jobId: `news-${Date.now()}`, ...this.defaultJobOptions })
   }
 
   @Cron('*/15 * * * *')
   async scheduleStatsCompute() {
-    await this.statsQueue.add('compute', {}, { jobId: `stats-${Date.now()}` })
+    await this.statsQueue.add('compute', {}, { jobId: `stats-${Date.now()}`, ...this.defaultJobOptions })
   }
 
   @Cron('0 3 * * 0')
   async scheduleCleanup() {
-    await this.cleanupQueue.add('cleanup', {}, { jobId: `cleanup-${Date.now()}` })
+    await this.cleanupQueue.add('cleanup', {}, { jobId: `cleanup-${Date.now()}`, ...this.defaultJobOptions })
   }
 
   @Cron('0 4 * * *') // Daily at 4am, after NASS scrape
   async scheduleReconcile() {
-    await this.reconcileQueue.add('reconcile', {}, { jobId: `reconcile-${Date.now()}` })
+    await this.reconcileQueue.add('reconcile', {}, { jobId: `reconcile-${Date.now()}`, ...this.defaultJobOptions })
   }
 
   // ─── Manual Triggers ────────────────────────────────────
 
   async triggerNass() {
-    const job = await this.nassQueue.add('scrape', { manual: true }, { priority: 1 })
+    const job = await this.nassQueue.add('scrape', { manual: true }, { priority: 1, ...this.defaultJobOptions })
     return { jobId: job.id, queue: QUEUE_NAMES.SCRAPE_NASS }
   }
 
   async triggerEfcc() {
-    const job = await this.efccQueue.add('scrape', { manual: true }, { priority: 1 })
+    const job = await this.efccQueue.add('scrape', { manual: true }, { priority: 1, ...this.defaultJobOptions })
     return { jobId: job.id, queue: QUEUE_NAMES.SCRAPE_EFCC }
   }
 
@@ -74,27 +81,27 @@ export class PipelineService {
   }
 
   async triggerSocial(targetId?: string) {
-    const job = await this.socialQueue.add('fetch', { manual: true, targetId }, { priority: 1 })
+    const job = await this.socialQueue.add('fetch', { manual: true, targetId }, { priority: 1, ...this.defaultJobOptions })
     return { jobId: job.id, queue: QUEUE_NAMES.FETCH_SOCIAL }
   }
 
   async triggerNews() {
-    const job = await this.newsQueue.add('fetch', { manual: true }, { priority: 1 })
+    const job = await this.newsQueue.add('fetch', { manual: true }, { priority: 1, ...this.defaultJobOptions })
     return { jobId: job.id, queue: QUEUE_NAMES.FETCH_NEWS }
   }
 
   async triggerSentiment() {
-    const job = await this.sentimentQueue.add('compute', { manual: true }, { priority: 1 })
+    const job = await this.sentimentQueue.add('compute', { manual: true }, { priority: 1, ...this.defaultJobOptions })
     return { jobId: job.id, queue: QUEUE_NAMES.COMPUTE_SENTIMENT }
   }
 
   async triggerStats() {
-    const job = await this.statsQueue.add('compute', { manual: true }, { priority: 1 })
+    const job = await this.statsQueue.add('compute', { manual: true }, { priority: 1, ...this.defaultJobOptions })
     return { jobId: job.id, queue: QUEUE_NAMES.COMPUTE_STATS }
   }
 
   async triggerReconcile() {
-    const job = await this.reconcileQueue.add('reconcile', { manual: true }, { priority: 1 })
+    const job = await this.reconcileQueue.add('reconcile', { manual: true }, { priority: 1, ...this.defaultJobOptions })
     return { jobId: job.id, queue: QUEUE_NAMES.RECONCILE_COUNTERS }
   }
 

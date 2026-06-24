@@ -1,6 +1,6 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq'
+import { Processor, WorkerHost, InjectQueue } from '@nestjs/bullmq'
 import { Logger } from '@nestjs/common'
-import { Job } from 'bullmq'
+import { Job, Queue } from 'bullmq'
 import { PrismaService } from '../../prisma/prisma.service'
 import { PusherService } from '../../pusher/pusher.service'
 import { QUEUE_NAMES } from '../pipeline.constants'
@@ -12,6 +12,7 @@ export class SocialProcessor extends WorkerHost {
   constructor(
     private prisma: PrismaService,
     private pusher: PusherService,
+    @InjectQueue(QUEUE_NAMES.COMPUTE_SENTIMENT) private sentimentQueue: Queue,
   ) {
     super()
   }
@@ -22,6 +23,16 @@ export class SocialProcessor extends WorkerHost {
     // For now, log and return — Twitter Bearer Token required
     this.logger.log('Social media fetch: Twitter API credentials required')
     await this.pusher.onPipelineJobComplete({ jobType: 'social', recordsProcessed: 0 })
+
+    // Trigger sentiment computation for newly fetched social data
+    try {
+      await this.sentimentQueue.add(
+        'compute',
+        { triggeredBy: 'social' },
+        { delay: 2000, jobId: `sentiment-after-social-${Date.now()}` }
+      )
+    } catch { /* Queue trigger failure is non-critical */ }
+
     return { processed: 0 }
   }
 }
