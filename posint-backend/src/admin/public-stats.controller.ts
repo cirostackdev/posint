@@ -17,7 +17,7 @@ export class PublicStatsController {
       politicians: full.politicians,
       elections: full.elections,
       bills: full.bills,
-      corruptionCases: full.cases,
+      corruptionCases: full.corruptionCases,
       totalRecoveredKobo: full.totalRecoveredKobo,
     }
   }

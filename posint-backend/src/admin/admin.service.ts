@@ -31,7 +31,7 @@ export class AdminService {
       }),
     ])
     const result = {
-      politicians, parties, elections, bills, billsPassed, cases, activeCases,
+      politicians, parties, elections, bills, billsPassed, corruptionCases: cases, activeCases,
       totalRecoveredKobo: recovered._sum.amountRecoveredKobo?.toString() ?? '0',
       constituencyProjects,
       partyDefections,
