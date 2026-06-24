@@ -9,6 +9,6 @@
   "moduleNameMapper": {
     "^@common/(.*)$": "<rootDir>/src/common/$1",
     "^@config/(.*)$": "<rootDir>/src/config/$1",
-    "^@prisma/(.*)$": "<rootDir>/src/prisma/$1"
+    "^@prisma/(?!client)(.*)$": "<rootDir>/src/prisma/$1"
   }
 }
