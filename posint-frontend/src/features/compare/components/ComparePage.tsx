@@ -2,18 +2,44 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import { ArrowLeft, GitCompareArrows } from "lucide-react"
 import { Button } from "@/shared/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { usePoliticians } from "@/features/politicians/hooks/use-politicians"
 import { CompareSelector } from "./CompareSelector"
-import { SentimentComparison } from "./SentimentComparison"
-import { VotingComparison } from "./VotingComparison"
-import { BillsComparison } from "./BillsComparison"
-import { AssetsComparison } from "./AssetsComparison"
-import { ProjectsComparison } from "./ProjectsComparison"
-import { DefectionComparison } from "./DefectionComparison"
+
+// Dynamically import comparison components for better code splitting
+const SentimentComparison = dynamic(
+  () => import("./SentimentComparison").then((m) => ({ default: m.SentimentComparison })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full rounded-lg" /> }
+)
+
+const VotingComparison = dynamic(
+  () => import("./VotingComparison").then((m) => ({ default: m.VotingComparison })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full rounded-lg" /> }
+)
+
+const BillsComparison = dynamic(
+  () => import("./BillsComparison").then((m) => ({ default: m.BillsComparison })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full rounded-lg" /> }
+)
+
+const AssetsComparison = dynamic(
+  () => import("./AssetsComparison").then((m) => ({ default: m.AssetsComparison })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full rounded-lg" /> }
+)
+
+const ProjectsComparison = dynamic(
+  () => import("./ProjectsComparison").then((m) => ({ default: m.ProjectsComparison })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full rounded-lg" /> }
+)
+
+const DefectionComparison = dynamic(
+  () => import("./DefectionComparison").then((m) => ({ default: m.DefectionComparison })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full rounded-lg" /> }
+)
 
 export function ComparePage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([])

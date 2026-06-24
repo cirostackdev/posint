@@ -78,7 +78,7 @@ export function AntiCorruptionPage() {
         </div>
 
         {/* Charts */}
-        <CorruptionChart byYear={stats?.byYear ?? []} byAgency={stats?.byAgency ?? []} />
+        <CorruptionChart />
 
         {/* Filters */}
         <SearchFilter

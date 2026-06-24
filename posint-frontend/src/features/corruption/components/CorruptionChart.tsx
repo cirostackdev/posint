@@ -2,27 +2,60 @@
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
+import { Skeleton } from "@/shared/components/ui/skeleton"
+import { useCorruptionStats } from "@/features/corruption/hooks/use-corruption"
 
-interface ByYearEntry {
-  year: number
-  cases: number
-  convictions: number
-}
+export function CorruptionChart() {
+  const { data: stats, isLoading, error } = useCorruptionStats()
 
-interface ByAgencyEntry {
-  agency: string
-  cases: number
-  convictions: number
-}
+  if (isLoading) {
+    return (
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card className="border-border/50">
+          <CardHeader>
+            <CardTitle className="text-lg">Corruption Cases Over Time</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-[300px] w-full" />
+          </CardContent>
+        </Card>
+        <Card className="border-border/50">
+          <CardHeader>
+            <CardTitle className="text-lg">Cases by Agency</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-[300px] w-full" />
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
-interface CorruptionChartProps {
-  byYear?: ByYearEntry[]
-  byAgency?: ByAgencyEntry[]
-}
+  if (error) {
+    return (
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card className="border-border/50">
+          <CardHeader>
+            <CardTitle className="text-lg">Corruption Cases Over Time</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-status-danger">Failed to load chart data</p>
+          </CardContent>
+        </Card>
+        <Card className="border-border/50">
+          <CardHeader>
+            <CardTitle className="text-lg">Cases by Agency</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-status-danger">Failed to load chart data</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
-export function CorruptionChart({ byYear = [], byAgency = [] }: CorruptionChartProps) {
-  const yearData = [...byYear].reverse()
-  const agencyData = byAgency.map(a => ({ name: a.agency, cases: a.cases, convictions: a.convictions }))
+  const yearData = stats?.byYear ? [...stats.byYear].reverse() : []
+  const agencyData = stats?.byAgency?.map(a => ({ name: a.agency, cases: a.cases, convictions: a.convictions })) ?? []
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
