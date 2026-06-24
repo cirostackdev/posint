@@ -3,6 +3,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { ConfigService } from '@nestjs/config'
 import { AppModule } from './app.module'
+import { buildCorsOrigins, corsOriginCallback } from './config/cors.config'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -12,20 +13,9 @@ async function bootstrap() {
   const frontendUrl = configService.get<string>('app.frontendUrl') ?? 'http://localhost:3000'
 
   // CORS — environment-driven allowlist
-  const allowedOrigins: string[] = [frontendUrl]
-  if (process.env.NODE_ENV !== 'production') {
-    allowedOrigins.push('http://localhost:3000', 'http://localhost:3001')
-  }
-
+  const allowedOrigins = buildCorsOrigins(frontendUrl, process.env.NODE_ENV ?? 'development')
   app.enableCors({
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-      // Allow requests with no origin (server-to-server, curl, health checks)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true)
-      } else {
-        callback(new Error(`Origin ${origin} not allowed by CORS`))
-      }
-    },
+    origin: corsOriginCallback(allowedOrigins),
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
