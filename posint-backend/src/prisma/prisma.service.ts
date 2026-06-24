@@ -35,3 +35,21 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     this.logger.log('Disconnected from Neon PostgreSQL')
   }
 }
+
+// ─── Global BigInt Serialization Fix ─────────────────────
+// Prevents "TypeError: Do not know how to serialize a BigInt" in JSON.stringify.
+// BigInt values (asset amounts, project budgets) are stored as bigint in Postgres
+// and returned as BigInt by Prisma. Express/NestJS serialize responses via JSON.stringify
+// which doesn't handle BigInt natively.
+//
+// This patch is safe: all BigInt → string conversions happen at JSON boundary only.
+// Consumers should treat these values as strings and use BigInt() to parse when needed.
+declare global {
+  interface BigInt {
+    toJSON(): string
+  }
+}
+
+BigInt.prototype.toJSON = function () {
+  return this.toString()
+}
