@@ -37,10 +37,29 @@ jobs:
       - run: npm run typecheck
       - run: npm test
 
+  migrate:
+    name: Run Migrations
+    runs-on: ubuntu-latest
+    needs: test
+    defaults:
+      run:
+        working-directory: posint-backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: posint-backend/package-lock.json
+      - run: npm ci
+      - run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL }}
+
   deploy:
     name: Build & Deploy
     runs-on: ubuntu-latest
-    needs: test
+    needs: [test, migrate]
     defaults:
       run:
         working-directory: posint-backend
