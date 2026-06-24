@@ -15,6 +15,7 @@ export class PipelineService {
     @InjectQueue(QUEUE_NAMES.COMPUTE_SENTIMENT) private sentimentQueue: Queue,
     @InjectQueue(QUEUE_NAMES.COMPUTE_STATS) private statsQueue: Queue,
     @InjectQueue(QUEUE_NAMES.CLEANUP) private cleanupQueue: Queue,
+    @InjectQueue(QUEUE_NAMES.RECONCILE_COUNTERS) private reconcileQueue: Queue,
   ) {}
 
   // ─── Scheduled Jobs ─────────────────────────────────────
@@ -43,6 +44,11 @@ export class PipelineService {
   @Cron('0 3 * * 0')
   async scheduleCleanup() {
     await this.cleanupQueue.add('cleanup', {}, { jobId: `cleanup-${Date.now()}` })
+  }
+
+  @Cron('0 4 * * *') // Daily at 4am, after NASS scrape
+  async scheduleReconcile() {
+    await this.reconcileQueue.add('reconcile', {}, { jobId: `reconcile-${Date.now()}` })
   }
 
   // ─── Manual Triggers ────────────────────────────────────
@@ -74,6 +80,11 @@ export class PipelineService {
   async triggerStats() {
     const job = await this.statsQueue.add('compute', { manual: true }, { priority: 1 })
     return { jobId: job.id, queue: QUEUE_NAMES.COMPUTE_STATS }
+  }
+
+  async triggerReconcile() {
+    const job = await this.reconcileQueue.add('reconcile', { manual: true }, { priority: 1 })
+    return { jobId: job.id, queue: QUEUE_NAMES.RECONCILE_COUNTERS }
   }
 
   async getJobsStatus() {

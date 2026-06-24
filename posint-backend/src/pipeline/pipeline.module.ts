@@ -9,6 +9,7 @@ import { EfccProcessor } from './processors/efcc.processor'
 import { SocialProcessor } from './processors/social.processor'
 import { SentimentProcessor } from './processors/sentiment.processor'
 import { StatsProcessor } from './processors/stats.processor'
+import { ReconcileProcessor } from './processors/reconcile.processor'
 import { NassScraper } from './scrapers/nass.scraper'
 import { EfccScraper } from './scrapers/efcc.scraper'
 import { InecScraper } from './scrapers/inec.scraper'
@@ -46,6 +47,7 @@ export { QUEUE_NAMES }
       { name: QUEUE_NAMES.COMPUTE_STATS },
       { name: QUEUE_NAMES.WARM_CACHE },
       { name: QUEUE_NAMES.CLEANUP },
+      { name: QUEUE_NAMES.RECONCILE_COUNTERS },
     ),
   ],
   controllers: [PipelineController],
@@ -56,6 +58,7 @@ export { QUEUE_NAMES }
     SocialProcessor,
     SentimentProcessor,
     StatsProcessor,
+    ReconcileProcessor,
     NassScraper,
     EfccScraper,
     InecScraper,

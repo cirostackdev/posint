@@ -7,4 +7,5 @@ export const QUEUE_NAMES = {
   COMPUTE_STATS: 'compute-stats',
   WARM_CACHE: 'warm-cache',
   CLEANUP: 'cleanup',
+  RECONCILE_COUNTERS: 'reconcile-counters',
 } as const
