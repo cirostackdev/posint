@@ -4,9 +4,17 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { ConfigService } from '@nestjs/config'
 import { AppModule } from './app.module'
 import { buildCorsOrigins, corsOriginCallback } from './config/cors.config'
+import helmet from 'helmet'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+
+  // Security headers
+  app.use(helmet({
+    hsts: { maxAge: 31536000, includeSubDomains: true },
+    contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+    crossOriginEmbedderPolicy: false, // Allow embedding for Swagger UI in dev
+  }))
 
   const configService = app.get(ConfigService)
   const port = configService.get<number>('app.port') ?? 4000
