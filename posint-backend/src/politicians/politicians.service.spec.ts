@@ -33,7 +33,7 @@ describe('PoliticiansService', () => {
   const mockRedis = {
     get: jest.fn().mockResolvedValue(null),
     set: jest.fn().mockResolvedValue(undefined),
-    delPattern: jest.fn().mockResolvedValue(undefined),
+    del: jest.fn().mockResolvedValue(undefined),
     getOrSet: jest.fn().mockImplementation((_key: string, fn: () => any) => fn()),
   }
 
@@ -145,7 +145,7 @@ describe('PoliticiansService', () => {
         where: { id: 'uuid-1' },
         data: { isActive: false },
       })
-      expect(mockRedis.delPattern).toHaveBeenCalledWith('politicians:*')
+      expect(mockRedis.del).toHaveBeenCalled()
     })
 
     it('should throw NotFoundException if politician not found', async () => {
