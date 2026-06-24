@@ -80,7 +80,7 @@ describe('PoliticiansService', () => {
 
       const result = await service.findBySlug('bola-tinubu')
 
-      expect(result).toEqual(mockPolitician)
+      expect(result).toEqual({ ...mockPolitician, corruptionCases: 0 })
       expect(mockPrisma.politician.findFirst).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { slug: 'bola-tinubu', isActive: true },
