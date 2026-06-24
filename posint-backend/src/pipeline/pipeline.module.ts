@@ -10,8 +10,9 @@ import { SocialProcessor } from './processors/social.processor'
 import { SentimentProcessor } from './processors/sentiment.processor'
 import { StatsProcessor } from './processors/stats.processor'
 import { ReconcileProcessor } from './processors/reconcile.processor'
-import { NassScraper } from './scrapers/nass.scraper'
+import { NassPlaywrightScraper } from './scrapers/nass-playwright.scraper'
 import { EfccScraper } from './scrapers/efcc.scraper'
+import { EfccPlaywrightScraper } from './scrapers/efcc-playwright.scraper'
 import { InecScraper } from './scrapers/inec.scraper'
 import { NewsRssScraper } from './scrapers/news-rss.scraper'
 import { NewsProcessor } from './processors/news.processor'
@@ -62,8 +63,9 @@ export { QUEUE_NAMES }
     SentimentProcessor,
     StatsProcessor,
     ReconcileProcessor,
-    NassScraper,
+    NassPlaywrightScraper,
     EfccScraper,
+    EfccPlaywrightScraper,
     InecScraper,
     NewsRssScraper,
     NewsProcessor,
