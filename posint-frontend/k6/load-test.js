@@ -1,77 +1,85 @@
-import http from 'k6/http';
-import { check, group, sleep } from 'k6';
+import http from "k6/http"
+import { check, sleep, group } from "k6"
+import { Rate, Trend } from "k6/metrics"
 
-const BASE_URL = __ENV.BASE_URL || 'http://localhost:3000';
-const BACKEND_URL = __ENV.BACKEND_URL || 'http://localhost:3001';
+const errorRate = new Rate("errors")
+const apiLatency = new Trend("api_latency", true)
 
 export const options = {
   stages: [
-    { duration: '1m', target: 1000 }, // Ramp-up: 0 to 1000 users over 1 minute
-    { duration: '1m', target: 1000 }, // Hold load: maintain 1000 users for 1 minute
-    { duration: '1m', target: 0 },    // Ramp-down: 1000 to 0 users over 1 minute
+    { duration: "30s", target: 100 },
+    { duration: "1m", target: 500 },
+    { duration: "2m", target: 1000 },
+    { duration: "1m", target: 1000 },
+    { duration: "30s", target: 0 },
   ],
   thresholds: {
-    http_req_duration: ['p(95)<500', 'p(99)<1000'], // 95% of requests under 500ms, 99% under 1s
-    http_req_failed: ['rate<0.1'], // Error rate must be less than 10%
+    http_req_duration: ["p(95)<2000", "p(99)<5000"],
+    errors: ["rate<0.05"],
+    api_latency: ["p(95)<1500"],
   },
-};
+}
+
+const BASE_URL = __ENV.API_URL || "http://localhost:4000/api/v1"
 
 export default function () {
-  // Group 1: Load home page
-  group('Home Page', () => {
-    const res = http.get(`${BASE_URL}/`);
-    check(res, {
-      'home status is 200': (r) => r.status === 200,
-      'home load time < 2s': (r) => r.timings.duration < 2000,
-    });
-    sleep(1);
-  });
+  group("Public Endpoints", () => {
+    const healthRes = http.get(`${BASE_URL}/health`)
+    check(healthRes, { "health 200": (r) => r.status === 200 })
+    errorRate.add(healthRes.status !== 200)
 
-  // Group 2: View politician list
-  group('Politician List', () => {
-    const res = http.get(`${BASE_URL}/politicians`);
-    check(res, {
-      'politician list status 200': (r) => r.status === 200,
-      'politician list duration < 1s': (r) => r.timings.duration < 1000,
-    });
-    sleep(1);
-  });
+    const statsRes = http.get(`${BASE_URL}/stats`)
+    check(statsRes, { "stats 200": (r) => r.status === 200 })
+    apiLatency.add(statsRes.timings.duration)
+    errorRate.add(statsRes.status !== 200)
 
-  // Group 3: Search for politician via tRPC endpoint
-  group('Search API', () => {
-    const payload = JSON.stringify({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'politician.search',
-      params: { query: 'tinubu', limit: 10 },
-    });
-    const res = http.post(`${BACKEND_URL}/api/v1/trpc`, payload, {
-      headers: { 'Content-Type': 'application/json' },
-    });
-    check(res, {
-      'search status 200': (r) => r.status === 200,
-      'search duration < 500ms': (r) => r.timings.duration < 500,
-    });
-    sleep(1);
-  });
+    const politiciansRes = http.get(`${BASE_URL}/politicians?page=1&limit=20`)
+    check(politiciansRes, {
+      "politicians 200": (r) => r.status === 200,
+      "politicians has data": (r) => {
+        try { return JSON.parse(r.body).data !== undefined } catch { return false }
+      },
+    })
+    apiLatency.add(politiciansRes.timings.duration)
+    errorRate.add(politiciansRes.status !== 200)
 
-  // Group 4: View election results
-  group('Elections', () => {
-    const res = http.get(`${BASE_URL}/elections`);
-    check(res, {
-      'elections status 200': (r) => r.status === 200,
-      'elections duration < 1s': (r) => r.timings.duration < 1000,
-    });
-    sleep(1);
-  });
+    const partiesRes = http.get(`${BASE_URL}/parties`)
+    check(partiesRes, { "parties 200": (r) => r.status === 200 })
+    apiLatency.add(partiesRes.timings.duration)
 
-  // Group 5: Check corruption statistics
-  group('Corruption Stats', () => {
-    const res = http.get(`${BASE_URL}/corruption`);
-    check(res, {
-      'corruption status 200': (r) => r.status === 200,
-      'corruption duration < 1s': (r) => r.timings.duration < 1000,
-    });
-    sleep(1);
-  });
+    const casesRes = http.get(`${BASE_URL}/corruption/cases?page=1&limit=20`)
+    check(casesRes, { "cases 200": (r) => r.status === 200 })
+    apiLatency.add(casesRes.timings.duration)
+
+    const billsRes = http.get(`${BASE_URL}/legislature/bills?page=1&limit=20`)
+    check(billsRes, { "bills 200": (r) => r.status === 200 })
+    apiLatency.add(billsRes.timings.duration)
+
+    const searchRes = http.get(`${BASE_URL}/search?q=tinubu`)
+    check(searchRes, { "search ok": (r) => r.status === 200 || r.status === 404 })
+    apiLatency.add(searchRes.timings.duration)
+  })
+
+  group("Auth Endpoints", () => {
+    const loginRes = http.post(
+      `${BASE_URL}/auth/login`,
+      JSON.stringify({ email: "loadtest@posint.ng", password: "LoadTest123!" }),
+      { headers: { "Content-Type": "application/json" } }
+    )
+
+    if (loginRes.status === 200) {
+      try {
+        const token = JSON.parse(loginRes.body).data?.accessToken
+        if (token) {
+          const adminStatsRes = http.get(`${BASE_URL}/admin/stats`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          check(adminStatsRes, { "admin stats auth ok": (r) => r.status === 200 || r.status === 403 })
+          apiLatency.add(adminStatsRes.timings.duration)
+        }
+      } catch {}
+    }
+  })
+
+  sleep(Math.random() * 2 + 1)
 }

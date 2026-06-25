@@ -44,6 +44,7 @@
     "@nestjs/throttler": "^6.4.0",
     "@prisma/client": "^5.22.0",
     "@sentry/nestjs": "^10.60.0",
+    "@sentry/node": "^10.60.0",
     "@upstash/redis": "^1.34.9",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.53.3",

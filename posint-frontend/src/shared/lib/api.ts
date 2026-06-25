@@ -195,4 +195,24 @@ export async function apiDelete(path: string): Promise<void> {
   }
 }
 
+export async function apiGetCursor<T>(
+  path: string,
+  params?: Record<string, string | number | boolean | null | undefined> & { cursor?: string | null },
+): Promise<{ data: T[]; nextCursor: string | null; hasMore: boolean }> {
+  const response = await fetchWithRefresh(buildUrl(path, params), {
+    headers: getHeaders(),
+    cache: "no-store",
+  })
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}))
+    throw new ApiError(response.status, body?.message ?? `HTTP ${response.status}`)
+  }
+  const body = await response.json()
+  return {
+    data: body.data,
+    nextCursor: body.meta?.nextCursor ?? null,
+    hasMore: body.meta?.hasMore ?? false,
+  }
+}
+
 export type { ApiError }

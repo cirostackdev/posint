@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { ThrottlerModule } from '@nestjs/throttler'
 import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core'
@@ -10,6 +10,7 @@ import jwtConfig from './config/jwt.config'
 import pusherConfig from './config/pusher.config'
 import throttleConfig from './config/throttle.config'
 
+import { SentryModule } from './common/sentry/sentry.module'
 import { PrismaModule } from './prisma/prisma.module'
 import { RedisModule } from './redis/redis.module'
 import { PusherModule } from './pusher/pusher.module'
@@ -31,6 +32,7 @@ import { WebhooksModule } from './webhooks/webhooks.module'
 import { ProvenanceModule } from './provenance/provenance.module'
 import { AnalyticsModule } from './analytics/analytics.module'
 
+import { AlertingMiddleware } from './common/middleware/alerting.middleware'
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard'
 import { RolesGuard } from './common/guards/roles.guard'
 import { HttpExceptionFilter } from './common/filters/http-exception.filter'
@@ -52,6 +54,9 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor'
       { name: 'long', ttl: 3600000, limit: 1000 },
       { name: 'auth', ttl: 60000, limit: 100 },  // Auth endpoints use this; overridden per-route
     ]),
+
+    // Observability (global, before everything else)
+    SentryModule,
 
     // Infrastructure (global)
     PrismaModule,
@@ -89,4 +94,8 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor'
     { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AlertingMiddleware).forRoutes('*')
+  }
+}
