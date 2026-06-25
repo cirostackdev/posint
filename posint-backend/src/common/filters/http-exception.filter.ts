@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common'
 import { Request, Response } from 'express'
+import * as Sentry from '@sentry/nestjs'
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -43,6 +44,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       } else {
         this.logger.error('Unhandled exception:', exception)
       }
+    }
+
+    if (statusCode >= 500 && process.env.NODE_ENV === 'production' && process.env.SENTRY_DSN) {
+      Sentry.captureException(exception)
     }
 
     response.status(statusCode).json({
