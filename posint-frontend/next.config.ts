@@ -81,7 +81,6 @@ export default process.env.NODE_ENV === "production"
       silent: !process.env.CI,
       widenClientFileUpload: true,
       tunnelRoute: "/monitoring",
-      hideSourceMaps: true,
-      disableLogger: true,
+      sourcemaps: { disable: true },
     })
   : config
