@@ -1,6 +1,7 @@
 import type { NextConfig } from "next"
 import bundleAnalyzer from "@next/bundle-analyzer"
 import withPWAInit from "@ducanh2912/next-pwa"
+import { withSentryConfig } from "@sentry/nextjs"
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -10,7 +11,7 @@ const withPWA = withPWAInit({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
   register: false,
-  skipWaiting: true,
+  skipWaiting: false,
   runtimeCaching: [
     {
       urlPattern: /^https?:\/\/.*\/_next\/static\/.*/i,
@@ -27,6 +28,10 @@ const withPWA = withPWAInit({
         cacheName: "api-responses",
         expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 },
         networkTimeoutSeconds: 10,
+        backgroundSync: {
+          name: "api-queue",
+          options: { maxRetentionTime: 60 * 24 },
+        },
       },
     },
     {
@@ -71,4 +76,12 @@ const nextConfig: NextConfig = {
 }
 
 const config = withBundleAnalyzer(withPWA(nextConfig))
-export default config
+export default process.env.NODE_ENV === "production"
+  ? withSentryConfig(config, {
+      silent: !process.env.CI,
+      widenClientFileUpload: true,
+      tunnelRoute: "/monitoring",
+      hideSourceMaps: true,
+      disableLogger: true,
+    })
+  : config
