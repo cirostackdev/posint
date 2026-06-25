@@ -5,9 +5,12 @@ import { ConfigService } from '@nestjs/config'
 import { AppModule } from './app.module'
 import { buildCorsOrigins, corsOriginCallback } from './config/cors.config'
 import helmet from 'helmet'
+import compression from 'compression'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+
+  app.use(compression({ level: 6, threshold: 1024 }))
 
   // Security headers
   app.use(helmet({

@@ -1,6 +1,21 @@
 import { PrismaClient } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 
+/**
+ * ⚠️  DEVELOPMENT SEED DATA — NOT FOR PRODUCTION
+ *
+ * This seed populates the development database with realistic-looking
+ * Nigerian political data for UI development and testing purposes.
+ *
+ * IMPORTANT:
+ * - All asset values, voting records, and social posts are SIMULATED
+ * - Source URLs that reference ccb.gov.ng, budgit.org etc. are PLACEHOLDERS
+ * - This data must NEVER appear in a production database
+ * - Production data comes ONLY from verified scraper pipelines
+ *
+ * Run: NODE_ENV=development npx prisma db seed
+ */
+
 // ─── Production Guard ─────────────────────────────────────────
 // SAFETY: Never run seed against production
 if (process.env.NODE_ENV === 'production') {
@@ -141,20 +156,20 @@ async function main() {
       { committeeName: 'Committee on Petroleum Upstream', role: 'Ex-Officio Member', startDate: new Date('2023-07-01'), chamber: 'SENATE' },
     ],
     assets: [
-      { category: 'Real Estate', description: 'Residential mansion in Maitama, Abuja (6-bedroom duplex with pool)', estimatedValueKobo: 300_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/akpabio-2023' },
-      { category: 'Real Estate', description: 'Commercial plaza in Uyo, Akwa Ibom State', estimatedValueKobo: 150_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/akpabio-2023' },
+      { category: 'Real Estate', description: 'Residential mansion in Maitama, Abuja (6-bedroom duplex with pool)', estimatedValueKobo: 300_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
+      { category: 'Real Estate', description: 'Commercial plaza in Uyo, Akwa Ibom State', estimatedValueKobo: 150_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
       { category: 'Vehicles', description: 'Mercedes-Benz S-Class, Toyota Land Cruiser V8, Range Rover Autobiography', estimatedValueKobo: 35_000_000_000n, yearDeclared: 2023, verified: false },
-      { category: 'Bank Accounts', description: 'Fixed deposits and savings in Access Bank, First Bank, Zenith Bank', estimatedValueKobo: 120_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/akpabio-2023' },
+      { category: 'Bank Accounts', description: 'Fixed deposits and savings in Access Bank, First Bank, Zenith Bank', estimatedValueKobo: 120_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
       { category: 'Investments', description: 'Equity holdings in Dangote Cement, MTN Nigeria, Nigerian Breweries', estimatedValueKobo: 80_000_000_000n, yearDeclared: 2023, verified: false },
     ],
     projects: [
-      { title: 'Essien Udim Road Network Rehabilitation', description: 'Rehabilitation of 45km road network in Essien Udim LGA connecting rural communities', location: 'Essien Udim, Akwa Ibom', budgetKobo: 3_500_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'Julius Berger Nigeria Plc', sourceUrl: 'https://budgit.org/project/essien-udim-roads' },
-      { title: 'Mkpat Enin Community Water Supply', description: 'Boreholes and water distribution network for Mkpat Enin community, 12,000 beneficiaries', location: 'Mkpat Enin, Akwa Ibom', budgetKobo: 750_000_000_000n, status: 'COMPLETED', year: 2021, completionPct: 100, contractor: 'Setraco Nigeria Ltd', sourceUrl: 'https://budgit.org/project/mkpat-enin-water' },
-      { title: 'Eket–Nsit Ubium Dual Carriageway', description: '28km dual carriageway connecting Eket port area to Nsit Ubium', location: 'Eket, Akwa Ibom', budgetKobo: 5_000_000_000_000n, status: 'ONGOING', year: 2023, completionPct: 42, contractor: 'CGC Nigeria Limited', sourceUrl: 'https://budgit.org/project/eket-nsit-road' },
+      { title: 'Essien Udim Road Network Rehabilitation', description: 'Rehabilitation of 45km road network in Essien Udim LGA connecting rural communities', location: 'Essien Udim, Akwa Ibom', budgetKobo: 3_500_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'Julius Berger Nigeria Plc', sourceUrl: null },
+      { title: 'Mkpat Enin Community Water Supply', description: 'Boreholes and water distribution network for Mkpat Enin community, 12,000 beneficiaries', location: 'Mkpat Enin, Akwa Ibom', budgetKobo: 750_000_000_000n, status: 'COMPLETED', year: 2021, completionPct: 100, contractor: 'Setraco Nigeria Ltd', sourceUrl: null },
+      { title: 'Eket–Nsit Ubium Dual Carriageway', description: '28km dual carriageway connecting Eket port area to Nsit Ubium', location: 'Eket, Akwa Ibom', budgetKobo: 5_000_000_000_000n, status: 'ONGOING', year: 2023, completionPct: 42, contractor: 'CGC Nigeria Limited', sourceUrl: null },
     ],
     votes: [
-      { billTitle: 'Petroleum Industry Act, 2021', vote: 'YES', sessionDate: new Date('2021-07-01'), billStatus: 'PASSED', sourceUrl: 'https://nass.gov.ng/bills/pia-2021' },
-      { billTitle: 'Electoral Act (Amendment) Act, 2022', vote: 'YES', sessionDate: new Date('2022-02-24'), billStatus: 'PASSED', sourceUrl: 'https://nass.gov.ng/bills/electoral-act-2022' },
+      { billTitle: 'Petroleum Industry Act, 2021', vote: 'YES', sessionDate: new Date('2021-07-01'), billStatus: 'PASSED', sourceUrl: null },
+      { billTitle: 'Electoral Act (Amendment) Act, 2022', vote: 'YES', sessionDate: new Date('2022-02-24'), billStatus: 'PASSED', sourceUrl: null },
       { billTitle: 'National Health Insurance Authority Act, 2022', vote: 'YES', sessionDate: new Date('2022-05-17'), billStatus: 'PASSED' },
       { billTitle: 'Student Loan (Access to Higher Education) Act, 2023', vote: 'YES', sessionDate: new Date('2023-04-12'), billStatus: 'PASSED' },
       { billTitle: 'Social Media (Prohibition of Falsehood) Bill, 2019', vote: 'YES', sessionDate: new Date('2019-11-05'), billStatus: 'REJECTED' },
@@ -203,18 +218,18 @@ async function main() {
       { committeeName: 'Committee on Economic Planning', role: 'Ex-Officio', startDate: new Date('2023-07-01'), chamber: 'HOUSE_OF_REPRESENTATIVES' },
     ],
     assets: [
-      { category: 'Real Estate', description: 'Residential property in Asokoro, Abuja (5-bedroom)', estimatedValueKobo: 200_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/tajudeen-abbas-2023' },
+      { category: 'Real Estate', description: 'Residential property in Asokoro, Abuja (5-bedroom)', estimatedValueKobo: 200_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
       { category: 'Real Estate', description: 'Family compound and properties in Zaria, Kaduna State', estimatedValueKobo: 80_000_000_000n, yearDeclared: 2023, verified: false },
       { category: 'Vehicles', description: 'Toyota Land Cruiser V8 and Honda Accord', estimatedValueKobo: 18_000_000_000n, yearDeclared: 2023, verified: false },
-      { category: 'Bank Accounts', description: 'Savings and investment accounts in UBA and Zenith Bank', estimatedValueKobo: 45_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/tajudeen-abbas-2023' },
+      { category: 'Bank Accounts', description: 'Savings and investment accounts in UBA and Zenith Bank', estimatedValueKobo: 45_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
     ],
     projects: [
-      { title: 'Zaria Model Primary Schools Rehabilitation', description: 'Renovation and equipment of 25 public primary schools in Zaria LGA', location: 'Zaria, Kaduna', budgetKobo: 1_200_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'Rholavic Nig Ltd', sourceUrl: 'https://budgit.org/project/zaria-schools' },
-      { title: 'Zaria–Sabon Gari Road Reconstruction', description: '12km road reconstruction linking Zaria city to Sabon Gari neighbourhood', location: 'Zaria, Kaduna', budgetKobo: 2_500_000_000_000n, status: 'ONGOING', year: 2023, completionPct: 60, contractor: 'Dantata & Sawoe Construction', sourceUrl: 'https://budgit.org/project/zaria-sabon-gari-road' },
-      { title: 'Zaria General Hospital Equipment Upgrade', description: 'Supply of modern medical equipment and ICU beds to Zaria General Hospital', location: 'Zaria, Kaduna', budgetKobo: 500_000_000_000n, status: 'COMPLETED', year: 2021, completionPct: 100, contractor: 'Medpharma Nig Ltd', sourceUrl: 'https://budgit.org/project/zaria-hospital' },
+      { title: 'Zaria Model Primary Schools Rehabilitation', description: 'Renovation and equipment of 25 public primary schools in Zaria LGA', location: 'Zaria, Kaduna', budgetKobo: 1_200_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'Rholavic Nig Ltd', sourceUrl: null },
+      { title: 'Zaria–Sabon Gari Road Reconstruction', description: '12km road reconstruction linking Zaria city to Sabon Gari neighbourhood', location: 'Zaria, Kaduna', budgetKobo: 2_500_000_000_000n, status: 'ONGOING', year: 2023, completionPct: 60, contractor: 'Dantata & Sawoe Construction', sourceUrl: null },
+      { title: 'Zaria General Hospital Equipment Upgrade', description: 'Supply of modern medical equipment and ICU beds to Zaria General Hospital', location: 'Zaria, Kaduna', budgetKobo: 500_000_000_000n, status: 'COMPLETED', year: 2021, completionPct: 100, contractor: 'Medpharma Nig Ltd', sourceUrl: null },
     ],
     votes: [
-      { billTitle: 'Student Loan (Access to Higher Education) Act, 2023', vote: 'YES', sessionDate: new Date('2023-04-12'), billStatus: 'PASSED', sourceUrl: 'https://nass.gov.ng/bills/student-loan-2023' },
+      { billTitle: 'Student Loan (Access to Higher Education) Act, 2023', vote: 'YES', sessionDate: new Date('2023-04-12'), billStatus: 'PASSED', sourceUrl: null },
       { billTitle: 'Tax Reform Bill (Joint Revenue Board Establishment) Act, 2024', vote: 'YES', sessionDate: new Date('2024-10-03'), billStatus: 'THIRD_READING' },
       { billTitle: 'Petroleum Industry Act, 2021', vote: 'YES', sessionDate: new Date('2021-07-01'), billStatus: 'PASSED' },
       { billTitle: 'Companies and Allied Matters Act (Amendment), 2020', vote: 'YES', sessionDate: new Date('2020-08-06'), billStatus: 'PASSED' },
@@ -261,14 +276,14 @@ async function main() {
       { committeeName: 'Committee on Local Government and Community Development', role: 'Chairman', startDate: new Date('2019-07-01'), endDate: new Date('2023-06-30'), chamber: 'SENATE' },
     ],
     assets: [
-      { category: 'Real Estate', description: 'Residential property in Wuse, Abuja', estimatedValueKobo: 120_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/ndume-2023' },
+      { category: 'Real Estate', description: 'Residential property in Wuse, Abuja', estimatedValueKobo: 120_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
       { category: 'Real Estate', description: 'Family compound and properties in Gwoza, Borno State', estimatedValueKobo: 60_000_000_000n, yearDeclared: 2023, verified: false },
       { category: 'Farm Land', description: '200 hectares of farmland in Biu LGA, Borno State', estimatedValueKobo: 20_000_000_000n, yearDeclared: 2023, verified: false },
       { category: 'Vehicles', description: 'Toyota Prado and two Honda SUVs', estimatedValueKobo: 12_000_000_000n, yearDeclared: 2023, verified: false },
     ],
     projects: [
-      { title: 'Chibok IDP Return Assistance Programme', description: 'Housing and livelihood support for 2,000 families displaced by Boko Haram returning to Chibok', location: 'Chibok, Borno', budgetKobo: 1_800_000_000_000n, status: 'ONGOING', year: 2022, completionPct: 55, contractor: 'Borno State MDG Programme', sourceUrl: 'https://budgit.org/project/chibok-idp' },
-      { title: 'Biu–Damboa Federal Road Rehabilitation', description: 'Rehabilitation of 60km federal road damaged by Boko Haram insurgency', location: 'Biu/Damboa, Borno', budgetKobo: 4_000_000_000_000n, status: 'ONGOING', year: 2023, completionPct: 30, contractor: 'Craneburg Construction Ltd', sourceUrl: 'https://budgit.org/project/biu-damboa-road' },
+      { title: 'Chibok IDP Return Assistance Programme', description: 'Housing and livelihood support for 2,000 families displaced by Boko Haram returning to Chibok', location: 'Chibok, Borno', budgetKobo: 1_800_000_000_000n, status: 'ONGOING', year: 2022, completionPct: 55, contractor: 'Borno State MDG Programme', sourceUrl: null },
+      { title: 'Biu–Damboa Federal Road Rehabilitation', description: 'Rehabilitation of 60km federal road damaged by Boko Haram insurgency', location: 'Biu/Damboa, Borno', budgetKobo: 4_000_000_000_000n, status: 'ONGOING', year: 2023, completionPct: 30, contractor: 'Craneburg Construction Ltd', sourceUrl: null },
     ],
     votes: [
       { billTitle: 'National Health Insurance Authority Act, 2022', vote: 'YES', sessionDate: new Date('2022-05-17'), billStatus: 'PASSED' },
@@ -322,16 +337,16 @@ async function main() {
       { committeeName: 'Committee on Disability Matters', role: 'Chairman', startDate: new Date('2019-07-01'), endDate: new Date('2022-06-01'), chamber: 'SENATE' },
     ],
     assets: [
-      { category: 'Real Estate', description: 'Residential property in Asokoro, Abuja (7-bedroom)', estimatedValueKobo: 280_000_000_000n, yearDeclared: 2019, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/ekweremadu-2019' },
-      { category: 'Real Estate', description: 'Property and land in Aninri, Enugu State', estimatedValueKobo: 90_000_000_000n, yearDeclared: 2019, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/ekweremadu-2019' },
+      { category: 'Real Estate', description: 'Residential property in Asokoro, Abuja (7-bedroom)', estimatedValueKobo: 280_000_000_000n, yearDeclared: 2019, verified: false, sourceDocumentUrl: null },
+      { category: 'Real Estate', description: 'Property and land in Aninri, Enugu State', estimatedValueKobo: 90_000_000_000n, yearDeclared: 2019, verified: false, sourceDocumentUrl: null },
       { category: 'Vehicles', description: 'Rolls Royce Ghost, Bentley Mulsanne, Mercedes-Benz GLS', estimatedValueKobo: 65_000_000_000n, yearDeclared: 2019, verified: false },
-      { category: 'Bank Accounts', description: 'Accounts in First Bank and UBA Nigeria', estimatedValueKobo: 95_000_000_000n, yearDeclared: 2019, verified: true },
+      { category: 'Bank Accounts', description: 'Accounts in First Bank and UBA Nigeria', estimatedValueKobo: 95_000_000_000n, yearDeclared: 2019, verified: false },
       { category: 'Investments', description: 'Shares in GT Holding, FBN Holdings, Nestle Nigeria', estimatedValueKobo: 45_000_000_000n, yearDeclared: 2019, verified: false },
     ],
     projects: [
-      { title: 'Aninri–Awgu Road Dualisation', description: 'Dualisation of 35km road connecting Aninri and Awgu LGAs', location: 'Aninri/Awgu, Enugu', budgetKobo: 6_000_000_000_000n, status: 'ABANDONED', year: 2020, completionPct: 18, contractor: 'Mothercat Limited', sourceUrl: 'https://budgit.org/project/aninri-awgu-road' },
-      { title: 'Enugu West Senatorial District Scholarship', description: 'Annual scholarship for 500 students from Enugu West senatorial district', location: 'Enugu West, Enugu', budgetKobo: 200_000_000_000n, status: 'ONGOING', year: 2018, completionPct: 70, contractor: 'Ekweremadu Foundation', sourceUrl: 'https://budgit.org/project/enugu-west-scholarship' },
-      { title: 'Oji River Health Centre Upgrade', description: 'Construction of new maternity ward and laboratory at Oji River Health Centre', location: 'Oji River, Enugu', budgetKobo: 300_000_000_000n, status: 'COMPLETED', year: 2019, completionPct: 100, contractor: 'Triokwu Engineering Ltd', sourceUrl: 'https://budgit.org/project/oji-river-health' },
+      { title: 'Aninri–Awgu Road Dualisation', description: 'Dualisation of 35km road connecting Aninri and Awgu LGAs', location: 'Aninri/Awgu, Enugu', budgetKobo: 6_000_000_000_000n, status: 'ABANDONED', year: 2020, completionPct: 18, contractor: 'Mothercat Limited', sourceUrl: null },
+      { title: 'Enugu West Senatorial District Scholarship', description: 'Annual scholarship for 500 students from Enugu West senatorial district', location: 'Enugu West, Enugu', budgetKobo: 200_000_000_000n, status: 'ONGOING', year: 2018, completionPct: 70, contractor: 'Ekweremadu Foundation', sourceUrl: null },
+      { title: 'Oji River Health Centre Upgrade', description: 'Construction of new maternity ward and laboratory at Oji River Health Centre', location: 'Oji River, Enugu', budgetKobo: 300_000_000_000n, status: 'COMPLETED', year: 2019, completionPct: 100, contractor: 'Triokwu Engineering Ltd', sourceUrl: null },
     ],
     votes: [
       { billTitle: 'Electoral Act (Amendment) Act, 2022', vote: 'YES', sessionDate: new Date('2022-02-24'), billStatus: 'PASSED' },
@@ -390,8 +405,8 @@ async function main() {
       { category: 'Farm Land', description: '500 hectares of commercial farmland in Arochukwu, Abia State', estimatedValueKobo: 25_000_000_000n, yearDeclared: 2023, verified: false },
     ],
     projects: [
-      { title: 'Arochukwu–Ohafia Federal Road Rehabilitation', description: 'Reconstruction of 42km dilapidated federal road linking Arochukwu to Ohafia', location: 'Arochukwu/Ohafia, Abia', budgetKobo: 3_800_000_000_000n, status: 'ONGOING', year: 2023, completionPct: 22, contractor: 'Reynolds Construction Company', sourceUrl: 'https://budgit.org/project/arochukwu-ohafia-road' },
-      { title: 'Abia North Scholarship and Empowerment Fund', description: 'Annual cash empowerment and scholarships for 1,000 Abia North youths', location: 'Abia North Senatorial District, Abia', budgetKobo: 150_000_000_000n, status: 'ONGOING', year: 2020, completionPct: 80, contractor: 'Orji Uzor Kalu Foundation', sourceUrl: 'https://budgit.org/project/abianorth-empowerment' },
+      { title: 'Arochukwu–Ohafia Federal Road Rehabilitation', description: 'Reconstruction of 42km dilapidated federal road linking Arochukwu to Ohafia', location: 'Arochukwu/Ohafia, Abia', budgetKobo: 3_800_000_000_000n, status: 'ONGOING', year: 2023, completionPct: 22, contractor: 'Reynolds Construction Company', sourceUrl: null },
+      { title: 'Abia North Scholarship and Empowerment Fund', description: 'Annual cash empowerment and scholarships for 1,000 Abia North youths', location: 'Abia North Senatorial District, Abia', budgetKobo: 150_000_000_000n, status: 'ONGOING', year: 2020, completionPct: 80, contractor: 'Orji Uzor Kalu Foundation', sourceUrl: null },
     ],
     votes: [
       { billTitle: 'Companies and Allied Matters Act (Amendment), 2020', vote: 'YES', sessionDate: new Date('2020-08-06'), billStatus: 'PASSED' },
@@ -456,8 +471,8 @@ async function main() {
       { category: 'Investments', description: 'Stake in entertainment and media businesses', estimatedValueKobo: 40_000_000_000n, yearDeclared: 2023, verified: false },
     ],
     projects: [
-      { title: 'Kabba–Okene Federal Road Emergency Repairs', description: 'Emergency pothole patching and drainage repairs on 50km federal road', location: 'Kabba, Kogi', budgetKobo: 800_000_000_000n, status: 'COMPLETED', year: 2018, completionPct: 100, contractor: 'State Roads Agency', sourceUrl: 'https://budgit.org/project/kabba-okene-road' },
-      { title: 'Kogi West Constituency Empowerment – Farming Kits', description: 'Distribution of irrigation pumps, seeds and fertiliser to 3,000 small-scale farmers', location: 'Kogi West Senatorial District', budgetKobo: 250_000_000_000n, status: 'COMPLETED', year: 2017, completionPct: 100, contractor: 'Dino Foundation', sourceUrl: 'https://budgit.org/project/kogiwest-farm' },
+      { title: 'Kabba–Okene Federal Road Emergency Repairs', description: 'Emergency pothole patching and drainage repairs on 50km federal road', location: 'Kabba, Kogi', budgetKobo: 800_000_000_000n, status: 'COMPLETED', year: 2018, completionPct: 100, contractor: 'State Roads Agency', sourceUrl: null },
+      { title: 'Kogi West Constituency Empowerment – Farming Kits', description: 'Distribution of irrigation pumps, seeds and fertiliser to 3,000 small-scale farmers', location: 'Kogi West Senatorial District', budgetKobo: 250_000_000_000n, status: 'COMPLETED', year: 2017, completionPct: 100, contractor: 'Dino Foundation', sourceUrl: null },
     ],
     votes: [
       { billTitle: 'Social Media (Prohibition of Falsehood) Bill, 2019', vote: 'NO', sessionDate: new Date('2019-11-05'), billStatus: 'REJECTED' },
@@ -514,8 +529,8 @@ async function main() {
       { category: 'Investments', description: 'Shares in various Lagos-based companies and real estate investment trusts', estimatedValueKobo: 300_000_000_000n, yearDeclared: 2023, verified: false },
     ],
     projects: [
-      { title: 'Lagos Central Women Empowerment Hub', description: 'Construction of skills acquisition centre for 2,000 women in Lagos Island LGA', location: 'Lagos Island, Lagos', budgetKobo: 600_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'Mixta Africa Plc', sourceUrl: 'https://budgit.org/project/lagos-central-women-hub' },
-      { title: 'Gender-Based Violence Response Centres (Lagos)', description: 'Establishment of 5 GBV response and counselling centres across Lagos Central', location: 'Lagos Central, Lagos', budgetKobo: 350_000_000_000n, status: 'ONGOING', year: 2021, completionPct: 80, contractor: 'Red Cross Nigeria / Lagos State', sourceUrl: 'https://budgit.org/project/lagos-gbv-centres' },
+      { title: 'Lagos Central Women Empowerment Hub', description: 'Construction of skills acquisition centre for 2,000 women in Lagos Island LGA', location: 'Lagos Island, Lagos', budgetKobo: 600_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'Mixta Africa Plc', sourceUrl: null },
+      { title: 'Gender-Based Violence Response Centres (Lagos)', description: 'Establishment of 5 GBV response and counselling centres across Lagos Central', location: 'Lagos Central, Lagos', budgetKobo: 350_000_000_000n, status: 'ONGOING', year: 2021, completionPct: 80, contractor: 'Red Cross Nigeria / Lagos State', sourceUrl: null },
     ],
     votes: [
       { billTitle: 'Gender and Equal Opportunities Bill', vote: 'YES', sessionDate: new Date('2021-03-08'), billStatus: 'SECOND_READING' },
@@ -563,13 +578,13 @@ async function main() {
       { committeeName: 'Committee on Appropriations', role: 'Member', startDate: new Date('2023-07-01'), chamber: 'SENATE' },
     ],
     assets: [
-      { category: 'Real Estate', description: 'Properties in Abeokuta, Ogun State and Abuja', estimatedValueKobo: 140_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/adeola-2023' },
+      { category: 'Real Estate', description: 'Properties in Abeokuta, Ogun State and Abuja', estimatedValueKobo: 140_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
       { category: 'Investments', description: 'Equity in financial services firms and real estate', estimatedValueKobo: 95_000_000_000n, yearDeclared: 2023, verified: false },
-      { category: 'Bank Accounts', description: 'Fixed deposits in GTBank, Zenith, and UBA', estimatedValueKobo: 60_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/adeola-2023' },
+      { category: 'Bank Accounts', description: 'Fixed deposits in GTBank, Zenith, and UBA', estimatedValueKobo: 60_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
     ],
     projects: [
-      { title: 'Ilaro–Abeokuta Highway Rehabilitation', description: 'Comprehensive rehabilitation of 75km Ilaro–Abeokuta highway including drainage works', location: 'Yewa North, Ogun', budgetKobo: 4_500_000_000_000n, status: 'ONGOING', year: 2022, completionPct: 48, contractor: 'CCECC Nigeria Limited', sourceUrl: 'https://budgit.org/project/ilaro-abeokuta-road' },
-      { title: 'Ogun West Borehole and Solar Water Project', description: '50 solar-powered boreholes installed across 50 communities in Ogun West', location: 'Ogun West District, Ogun', budgetKobo: 900_000_000_000n, status: 'COMPLETED', year: 2021, completionPct: 100, contractor: 'Watertech Nigeria Ltd', sourceUrl: 'https://budgit.org/project/ogunwest-boreholes' },
+      { title: 'Ilaro–Abeokuta Highway Rehabilitation', description: 'Comprehensive rehabilitation of 75km Ilaro–Abeokuta highway including drainage works', location: 'Yewa North, Ogun', budgetKobo: 4_500_000_000_000n, status: 'ONGOING', year: 2022, completionPct: 48, contractor: 'CCECC Nigeria Limited', sourceUrl: null },
+      { title: 'Ogun West Borehole and Solar Water Project', description: '50 solar-powered boreholes installed across 50 communities in Ogun West', location: 'Ogun West District, Ogun', budgetKobo: 900_000_000_000n, status: 'COMPLETED', year: 2021, completionPct: 100, contractor: 'Watertech Nigeria Ltd', sourceUrl: null },
     ],
     votes: [
       { billTitle: 'Minimum Wage (Amendment) Act, 2024', vote: 'YES', sessionDate: new Date('2024-07-11'), billStatus: 'PASSED' },
@@ -625,8 +640,8 @@ async function main() {
       { category: 'Bank Accounts', description: 'Multi-currency accounts in Nigerian and international banks', estimatedValueKobo: 180_000_000_000n, yearDeclared: 2023, verified: false },
     ],
     projects: [
-      { title: 'Nnewi Industrial Zone Road Infrastructure', description: 'Rehabilitation of 20km road network serving Nnewi industrial cluster', location: 'Nnewi, Anambra', budgetKobo: 2_200_000_000_000n, status: 'COMPLETED', year: 2021, completionPct: 100, contractor: 'C-Executives Nigeria Ltd', sourceUrl: 'https://budgit.org/project/nnewi-industrial-road' },
-      { title: 'Anambra South Youth Entrepreneurship Fund', description: 'Interest-free loans and mentorship for 500 youth businesses in Anambra South', location: 'Anambra South District, Anambra', budgetKobo: 500_000_000_000n, status: 'ONGOING', year: 2022, completionPct: 65, contractor: 'Capital Oil Foundation', sourceUrl: 'https://budgit.org/project/anambra-youth-fund' },
+      { title: 'Nnewi Industrial Zone Road Infrastructure', description: 'Rehabilitation of 20km road network serving Nnewi industrial cluster', location: 'Nnewi, Anambra', budgetKobo: 2_200_000_000_000n, status: 'COMPLETED', year: 2021, completionPct: 100, contractor: 'C-Executives Nigeria Ltd', sourceUrl: null },
+      { title: 'Anambra South Youth Entrepreneurship Fund', description: 'Interest-free loans and mentorship for 500 youth businesses in Anambra South', location: 'Anambra South District, Anambra', budgetKobo: 500_000_000_000n, status: 'ONGOING', year: 2022, completionPct: 65, contractor: 'Capital Oil Foundation', sourceUrl: null },
     ],
     votes: [
       { billTitle: 'Petroleum Industry Act, 2021', vote: 'YES', sessionDate: new Date('2021-07-01'), billStatus: 'PASSED' },
@@ -681,8 +696,8 @@ async function main() {
       { category: 'Farm Land', description: '1,500 hectares of agricultural land in Delta State', estimatedValueKobo: 75_000_000_000n, yearDeclared: 2023, verified: false },
     ],
     projects: [
-      { title: 'Delta North Malaria Eradication Campaign', description: 'Mass distribution of mosquito nets and indoor residual spraying across Delta North senatorial district', location: 'Delta North, Delta', budgetKobo: 800_000_000_000n, status: 'ONGOING', year: 2020, completionPct: 70, contractor: 'Ned Nwoko Foundation', sourceUrl: 'https://budgit.org/project/delta-north-malaria' },
-      { title: 'Idumuje-Ugboko Palace and Cultural Centre', description: 'Construction of a new royal palace and Igbo cultural heritage centre', location: 'Idumuje-Ugboko, Delta', budgetKobo: 1_500_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'Ned Nwoko Group', sourceUrl: 'https://budgit.org/project/idumuje-palace' },
+      { title: 'Delta North Malaria Eradication Campaign', description: 'Mass distribution of mosquito nets and indoor residual spraying across Delta North senatorial district', location: 'Delta North, Delta', budgetKobo: 800_000_000_000n, status: 'ONGOING', year: 2020, completionPct: 70, contractor: 'Ned Nwoko Foundation', sourceUrl: null },
+      { title: 'Idumuje-Ugboko Palace and Cultural Centre', description: 'Construction of a new royal palace and Igbo cultural heritage centre', location: 'Idumuje-Ugboko, Delta', budgetKobo: 1_500_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'Ned Nwoko Group', sourceUrl: null },
     ],
     votes: [
       { billTitle: 'National Senior Citizens Centre Bill, 2022', vote: 'YES', sessionDate: new Date('2022-08-30'), billStatus: 'PASSED' },
@@ -744,8 +759,8 @@ async function main() {
       { category: 'Investments', description: 'Legal practice shares and real estate investments', estimatedValueKobo: 120_000_000_000n, yearDeclared: 2023, verified: false },
     ],
     projects: [
-      { title: 'Surulere Roads Emergency Rehabilitation', description: 'Patching and drainage improvement on 12 streets in Surulere constituency', location: 'Surulere, Lagos', budgetKobo: 1_400_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'Lagos State PWD', sourceUrl: 'https://budgit.org/project/surulere-roads' },
-      { title: 'Surulere Youth Sports Complex', description: 'Construction of mini-stadium with football pitch and athletics track in Surulere', location: 'Surulere, Lagos', budgetKobo: 2_000_000_000_000n, status: 'ONGOING', year: 2021, completionPct: 55, contractor: 'Cappa D\'Alberto Plc', sourceUrl: 'https://budgit.org/project/surulere-sports' },
+      { title: 'Surulere Roads Emergency Rehabilitation', description: 'Patching and drainage improvement on 12 streets in Surulere constituency', location: 'Surulere, Lagos', budgetKobo: 1_400_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'Lagos State PWD', sourceUrl: null },
+      { title: 'Surulere Youth Sports Complex', description: 'Construction of mini-stadium with football pitch and athletics track in Surulere', location: 'Surulere, Lagos', budgetKobo: 2_000_000_000_000n, status: 'ONGOING', year: 2021, completionPct: 55, contractor: 'Cappa D\'Alberto Plc', sourceUrl: null },
     ],
     votes: [
       { billTitle: 'Companies and Allied Matters Act (Amendment), 2020', vote: 'YES', sessionDate: new Date('2020-08-06'), billStatus: 'PASSED' },
@@ -792,10 +807,10 @@ async function main() {
     ],
     committees: [],
     assets: [
-      { category: 'Bank Accounts', description: 'Published bank statements showing modest savings; known for transparency in asset declarations', estimatedValueKobo: 45_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/peter-obi-2023' },
-      { category: 'Real Estate', description: 'Residential properties in Onitsha, Anambra State', estimatedValueKobo: 80_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/peter-obi-2023' },
+      { category: 'Bank Accounts', description: 'Published bank statements showing modest savings; known for transparency in asset declarations', estimatedValueKobo: 45_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
+      { category: 'Real Estate', description: 'Residential properties in Onitsha, Anambra State', estimatedValueKobo: 80_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
       { category: 'Investments', description: 'Shares in Fidelity Bank and other Nigerian companies', estimatedValueKobo: 55_000_000_000n, yearDeclared: 2023, verified: false },
-      { category: 'Vehicles', description: 'Toyota Camry and modest vehicle holdings', estimatedValueKobo: 3_000_000_000n, yearDeclared: 2023, verified: true },
+      { category: 'Vehicles', description: 'Toyota Camry and modest vehicle holdings', estimatedValueKobo: 3_000_000_000n, yearDeclared: 2023, verified: false },
     ],
     projects: [],
     votes: [],
@@ -845,9 +860,9 @@ async function main() {
       { category: 'Bank Accounts', description: 'Bank accounts in multiple Nigerian and foreign banks', estimatedValueKobo: 250_000_000_000n, yearDeclared: 2023, verified: false },
     ],
     projects: [
-      { title: 'Abuja Ring Road Phase 1 (FCT)', description: 'Construction of 14km expressway linking key FCT districts — Wike\'s flagship Abuja project', location: 'FCT, Abuja', budgetKobo: 15_000_000_000_000n, status: 'ONGOING', year: 2023, completionPct: 35, contractor: 'Julius Berger Nigeria Plc', sourceUrl: 'https://budgit.org/project/abuja-ring-road' },
-      { title: 'Port Harcourt Flyover Network', description: '6 major flyovers built across Port Harcourt as Rivers State Governor', location: 'Port Harcourt, Rivers', budgetKobo: 12_000_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'RCC Nigeria Ltd', sourceUrl: 'https://budgit.org/project/ph-flyovers' },
-      { title: 'Abuja Independent Power Plant', description: 'Construction of 1,000MW gas power plant to end FCT power shortages', location: 'FCT, Abuja', budgetKobo: 25_000_000_000_000n, status: 'NOT_STARTED', year: 2024, completionPct: 0, contractor: 'Under procurement', sourceUrl: 'https://budgit.org/project/abuja-ipp' },
+      { title: 'Abuja Ring Road Phase 1 (FCT)', description: 'Construction of 14km expressway linking key FCT districts — Wike\'s flagship Abuja project', location: 'FCT, Abuja', budgetKobo: 15_000_000_000_000n, status: 'ONGOING', year: 2023, completionPct: 35, contractor: 'Julius Berger Nigeria Plc', sourceUrl: null },
+      { title: 'Port Harcourt Flyover Network', description: '6 major flyovers built across Port Harcourt as Rivers State Governor', location: 'Port Harcourt, Rivers', budgetKobo: 12_000_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'RCC Nigeria Ltd', sourceUrl: null },
+      { title: 'Abuja Independent Power Plant', description: 'Construction of 1,000MW gas power plant to end FCT power shortages', location: 'FCT, Abuja', budgetKobo: 25_000_000_000_000n, status: 'NOT_STARTED', year: 2024, completionPct: 0, contractor: 'Under procurement', sourceUrl: null },
     ],
     votes: [],
     social: [
@@ -890,13 +905,13 @@ async function main() {
     committees: [],
     assets: [
       { category: 'Real Estate', description: 'Properties in Ikoyi, Victoria Island, and Lekki, Lagos', estimatedValueKobo: 450_000_000_000n, yearDeclared: 2023, verified: false },
-      { category: 'Bank Accounts', description: 'Accounts in major Nigerian commercial banks', estimatedValueKobo: 90_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/sanwo-olu-2023' },
+      { category: 'Bank Accounts', description: 'Accounts in major Nigerian commercial banks', estimatedValueKobo: 90_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
       { category: 'Investments', description: 'Shares in listed companies and private equity interests', estimatedValueKobo: 140_000_000_000n, yearDeclared: 2023, verified: false },
     ],
     projects: [
-      { title: 'Lagos Rail Mass Transit Blue Line (Marina–Mile 2)', description: '13km elevated light rail — Nigeria\'s first operational urban rail, commissioned December 2022', location: 'Marina to Mile 2, Lagos', budgetKobo: 110_000_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'CCECC/CRC Consortium', sourceUrl: 'https://budgit.org/project/lagos-blue-line' },
-      { title: 'Lagos Rail Mass Transit Red Line', description: '37km commuter rail from Agbado to Marina; extension of Blue Line network', location: 'Agbado to Marina, Lagos', budgetKobo: 140_000_000_000_000n, status: 'COMPLETED', year: 2023, completionPct: 100, contractor: 'CCECC Nigeria Limited', sourceUrl: 'https://budgit.org/project/lagos-red-line' },
-      { title: 'Lekki Deep Seaport', description: 'Construction of the Lekki Deep Sea Port — Nigeria\'s largest, operational 2023', location: 'Lekki, Lagos', budgetKobo: 150_000_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'Tolaram Group', sourceUrl: 'https://budgit.org/project/lekki-deepseaport' },
+      { title: 'Lagos Rail Mass Transit Blue Line (Marina–Mile 2)', description: '13km elevated light rail — Nigeria\'s first operational urban rail, commissioned December 2022', location: 'Marina to Mile 2, Lagos', budgetKobo: 110_000_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'CCECC/CRC Consortium', sourceUrl: null },
+      { title: 'Lagos Rail Mass Transit Red Line', description: '37km commuter rail from Agbado to Marina; extension of Blue Line network', location: 'Agbado to Marina, Lagos', budgetKobo: 140_000_000_000_000n, status: 'COMPLETED', year: 2023, completionPct: 100, contractor: 'CCECC Nigeria Limited', sourceUrl: null },
+      { title: 'Lekki Deep Seaport', description: 'Construction of the Lekki Deep Sea Port — Nigeria\'s largest, operational 2023', location: 'Lekki, Lagos', budgetKobo: 150_000_000_000_000n, status: 'COMPLETED', year: 2022, completionPct: 100, contractor: 'Tolaram Group', sourceUrl: null },
     ],
     votes: [],
     social: [
@@ -942,9 +957,9 @@ async function main() {
       { category: 'Bank Accounts', description: 'Accounts in various Nigerian banks', estimatedValueKobo: 70_000_000_000n, yearDeclared: 2023, verified: false },
     ],
     projects: [
-      { title: 'Oyo State Free Education Programme', description: 'Payment of WAEC/NECO fees and provision of free textbooks for all public secondary school students in Oyo', location: 'Oyo State', budgetKobo: 2_400_000_000_000n, status: 'ONGOING', year: 2019, completionPct: 85, contractor: 'Oyo State Ministry of Education', sourceUrl: 'https://budgit.org/project/oyo-free-education' },
-      { title: 'Ibadan Circular Road (Ring Road)', description: '80km ring road around Ibadan city to ease traffic and open new development corridors', location: 'Ibadan, Oyo', budgetKobo: 10_000_000_000_000n, status: 'ONGOING', year: 2021, completionPct: 38, contractor: 'Julius Berger / Hitech Construction', sourceUrl: 'https://budgit.org/project/ibadan-ring-road' },
-      { title: 'Ibadan Airport Expansion', description: 'Rehabilitation and international expansion of Ibadan Airport terminal and runway', location: 'Ibadan, Oyo', budgetKobo: 5_000_000_000_000n, status: 'ONGOING', year: 2022, completionPct: 55, contractor: 'Julius Berger Nigeria Plc', sourceUrl: 'https://budgit.org/project/ibadan-airport' },
+      { title: 'Oyo State Free Education Programme', description: 'Payment of WAEC/NECO fees and provision of free textbooks for all public secondary school students in Oyo', location: 'Oyo State', budgetKobo: 2_400_000_000_000n, status: 'ONGOING', year: 2019, completionPct: 85, contractor: 'Oyo State Ministry of Education', sourceUrl: null },
+      { title: 'Ibadan Circular Road (Ring Road)', description: '80km ring road around Ibadan city to ease traffic and open new development corridors', location: 'Ibadan, Oyo', budgetKobo: 10_000_000_000_000n, status: 'ONGOING', year: 2021, completionPct: 38, contractor: 'Julius Berger / Hitech Construction', sourceUrl: null },
+      { title: 'Ibadan Airport Expansion', description: 'Rehabilitation and international expansion of Ibadan Airport terminal and runway', location: 'Ibadan, Oyo', budgetKobo: 5_000_000_000_000n, status: 'ONGOING', year: 2022, completionPct: 55, contractor: 'Julius Berger Nigeria Plc', sourceUrl: null },
     ],
     votes: [],
     social: [
@@ -992,13 +1007,13 @@ async function main() {
     ],
     committees: [],
     assets: [
-      { category: 'Investments', description: 'Banking and financial sector investments', estimatedValueKobo: 280_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/alex-otti-2023' },
-      { category: 'Real Estate', description: 'Properties in Umuahia, Lagos, and Abuja', estimatedValueKobo: 120_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/alex-otti-2023' },
-      { category: 'Bank Accounts', description: 'Accounts declared to CCB on assumption of office', estimatedValueKobo: 65_000_000_000n, yearDeclared: 2023, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/alex-otti-2023' },
+      { category: 'Investments', description: 'Banking and financial sector investments', estimatedValueKobo: 280_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
+      { category: 'Real Estate', description: 'Properties in Umuahia, Lagos, and Abuja', estimatedValueKobo: 120_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
+      { category: 'Bank Accounts', description: 'Accounts declared to CCB on assumption of office', estimatedValueKobo: 65_000_000_000n, yearDeclared: 2023, verified: false, sourceDocumentUrl: null },
     ],
     projects: [
-      { title: 'Civil Servants Salary Arrears Clearance', description: 'Clearance of 10 months of outstanding salary arrears owed to Abia State workers inherited from PDP government', location: 'Abia State', budgetKobo: 4_500_000_000_000n, status: 'COMPLETED', year: 2023, completionPct: 100, contractor: 'Government of Abia State', sourceUrl: 'https://budgit.org/project/abia-salary-arrears' },
-      { title: 'Aba Flyover & Roads Rehabilitation Package', description: 'Emergency rehabilitation of 35km roads in Aba commercial city including new flyover', location: 'Aba, Abia', budgetKobo: 6_000_000_000_000n, status: 'ONGOING', year: 2024, completionPct: 28, contractor: 'Craneburg Construction', sourceUrl: 'https://budgit.org/project/aba-flyover' },
+      { title: 'Civil Servants Salary Arrears Clearance', description: 'Clearance of 10 months of outstanding salary arrears owed to Abia State workers inherited from PDP government', location: 'Abia State', budgetKobo: 4_500_000_000_000n, status: 'COMPLETED', year: 2023, completionPct: 100, contractor: 'Government of Abia State', sourceUrl: null },
+      { title: 'Aba Flyover & Roads Rehabilitation Package', description: 'Emergency rehabilitation of 35km roads in Aba commercial city including new flyover', location: 'Aba, Abia', budgetKobo: 6_000_000_000_000n, status: 'ONGOING', year: 2024, completionPct: 28, contractor: 'Craneburg Construction', sourceUrl: null },
     ],
     votes: [],
     social: [
@@ -1047,8 +1062,8 @@ async function main() {
       { category: 'Vehicles', description: 'Toyota Land Cruiser and Honda Pilot', estimatedValueKobo: 11_000_000_000n, yearDeclared: 2023, verified: false },
     ],
     projects: [
-      { title: 'Jos Peace Centre', description: 'Construction of interfaith peace and dialogue centre in Jos', location: 'Jos, Plateau', budgetKobo: 800_000_000_000n, status: 'COMPLETED', year: 2020, completionPct: 100, contractor: 'Plateau State MWC', sourceUrl: 'https://budgit.org/project/jos-peace-centre' },
-      { title: 'Plateau State Rural Road Programme', description: '200km of rural feeder roads connecting farming communities to markets', location: 'Plateau State', budgetKobo: 6_000_000_000_000n, status: 'ONGOING', year: 2021, completionPct: 68, contractor: 'Julius Berger / RCC', sourceUrl: 'https://budgit.org/project/plateau-rural-roads' },
+      { title: 'Jos Peace Centre', description: 'Construction of interfaith peace and dialogue centre in Jos', location: 'Jos, Plateau', budgetKobo: 800_000_000_000n, status: 'COMPLETED', year: 2020, completionPct: 100, contractor: 'Plateau State MWC', sourceUrl: null },
+      { title: 'Plateau State Rural Road Programme', description: '200km of rural feeder roads connecting farming communities to markets', location: 'Plateau State', budgetKobo: 6_000_000_000_000n, status: 'ONGOING', year: 2021, completionPct: 68, contractor: 'Julius Berger / RCC', sourceUrl: null },
     ],
     votes: [
       { billTitle: 'Petroleum Industry Act, 2021', vote: 'YES', sessionDate: new Date('2021-07-01'), billStatus: 'PASSED' },
@@ -1097,13 +1112,13 @@ async function main() {
       { committeeName: 'Committee on Anti-Corruption', role: 'Member', startDate: new Date('2015-07-01'), endDate: new Date('2019-06-30'), chamber: 'SENATE' },
     ],
     assets: [
-      { category: 'Real Estate', description: 'Modest family home in Kaduna', estimatedValueKobo: 18_000_000_000n, yearDeclared: 2019, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/shehu-sani-2019' },
-      { category: 'Bank Accounts', description: 'Savings accounts in Kaduna-based banks', estimatedValueKobo: 8_000_000_000n, yearDeclared: 2019, verified: true, sourceDocumentUrl: 'https://ccb.gov.ng/declarations/shehu-sani-2019' },
-      { category: 'Vehicles', description: 'Toyota Camry 2014', estimatedValueKobo: 1_500_000_000n, yearDeclared: 2019, verified: true },
+      { category: 'Real Estate', description: 'Modest family home in Kaduna', estimatedValueKobo: 18_000_000_000n, yearDeclared: 2019, verified: false, sourceDocumentUrl: null },
+      { category: 'Bank Accounts', description: 'Savings accounts in Kaduna-based banks', estimatedValueKobo: 8_000_000_000n, yearDeclared: 2019, verified: false, sourceDocumentUrl: null },
+      { category: 'Vehicles', description: 'Toyota Camry 2014', estimatedValueKobo: 1_500_000_000n, yearDeclared: 2019, verified: false },
     ],
     projects: [
-      { title: 'Kaduna Central Youth Skills Programme', description: 'Vocational training for 1,000 youths in Kaduna city in carpentry, tailoring, and ICT', location: 'Kaduna Central, Kaduna', budgetKobo: 200_000_000_000n, status: 'COMPLETED', year: 2018, completionPct: 100, contractor: 'Kaduna Polytechnic', sourceUrl: 'https://budgit.org/project/kaduna-central-youth' },
-      { title: 'Zaria City Heritage Conservation', description: 'Documentation and restoration of historic Zaria city walls and Hausa architecture', location: 'Zaria, Kaduna', budgetKobo: 120_000_000_000n, status: 'COMPLETED', year: 2017, completionPct: 100, contractor: 'Kaduna SMDF', sourceUrl: 'https://budgit.org/project/zaria-heritage' },
+      { title: 'Kaduna Central Youth Skills Programme', description: 'Vocational training for 1,000 youths in Kaduna city in carpentry, tailoring, and ICT', location: 'Kaduna Central, Kaduna', budgetKobo: 200_000_000_000n, status: 'COMPLETED', year: 2018, completionPct: 100, contractor: 'Kaduna Polytechnic', sourceUrl: null },
+      { title: 'Zaria City Heritage Conservation', description: 'Documentation and restoration of historic Zaria city walls and Hausa architecture', location: 'Zaria, Kaduna', budgetKobo: 120_000_000_000n, status: 'COMPLETED', year: 2017, completionPct: 100, contractor: 'Kaduna SMDF', sourceUrl: null },
     ],
     votes: [
       { billTitle: 'Social Media (Prohibition of Falsehood) Bill, 2019', vote: 'NO', sessionDate: new Date('2019-11-05'), billStatus: 'REJECTED' },
@@ -1157,8 +1172,8 @@ async function main() {
       { category: 'Vehicles', description: 'Toyota Land Cruiser and Honda CR-V', estimatedValueKobo: 9_000_000_000n, yearDeclared: 2022, verified: false },
     ],
     projects: [
-      { title: 'Isiala Mbano Technical College Upgrade', description: 'Renovation and equipment of Isiala Mbano Technical College workshop', location: 'Isiala Mbano, Imo', budgetKobo: 400_000_000_000n, status: 'COMPLETED', year: 2017, completionPct: 100, contractor: 'Imo State Works', sourceUrl: 'https://budgit.org/project/isiala-mbano-tech' },
-      { title: 'Okigwe–Owerri Road Drainage Works', description: 'Drainage and flood control works on the Okigwe–Owerri federal road segment', location: 'Okigwe, Imo', budgetKobo: 350_000_000_000n, status: 'COMPLETED', year: 2016, completionPct: 100, contractor: 'Hicson Nig Ltd', sourceUrl: 'https://budgit.org/project/okigwe-drainage' },
+      { title: 'Isiala Mbano Technical College Upgrade', description: 'Renovation and equipment of Isiala Mbano Technical College workshop', location: 'Isiala Mbano, Imo', budgetKobo: 400_000_000_000n, status: 'COMPLETED', year: 2017, completionPct: 100, contractor: 'Imo State Works', sourceUrl: null },
+      { title: 'Okigwe–Owerri Road Drainage Works', description: 'Drainage and flood control works on the Okigwe–Owerri federal road segment', location: 'Okigwe, Imo', budgetKobo: 350_000_000_000n, status: 'COMPLETED', year: 2016, completionPct: 100, contractor: 'Hicson Nig Ltd', sourceUrl: null },
     ],
     votes: [
       { billTitle: 'Student Loan (Access to Higher Education) Act, 2023', vote: 'YES', sessionDate: new Date('2023-04-12'), billStatus: 'PASSED' },
@@ -1210,8 +1225,8 @@ async function main() {
       { category: 'Investments', description: 'Consulting and intellectual property interests', estimatedValueKobo: 80_000_000_000n, yearDeclared: 2022, verified: false },
     ],
     projects: [
-      { title: 'Ekiti Knowledge Zone (Special Economic Zone)', description: 'Development of 2,000-hectare special economic zone near Ado-Ekiti', location: 'Ado-Ekiti, Ekiti', budgetKobo: 20_000_000_000_000n, status: 'ONGOING', year: 2020, completionPct: 22, contractor: 'Ekiti State Investment Promotion Agency', sourceUrl: 'https://budgit.org/project/ekiti-knowledge-zone' },
-      { title: 'Ekiti State Farmers Support Scheme', description: 'Input support, insurance, and market linkage for 80,000 smallholder farmers', location: 'Ekiti State', budgetKobo: 1_200_000_000_000n, status: 'COMPLETED', year: 2021, completionPct: 100, contractor: 'FADAMA III', sourceUrl: 'https://budgit.org/project/ekiti-farmers' },
+      { title: 'Ekiti Knowledge Zone (Special Economic Zone)', description: 'Development of 2,000-hectare special economic zone near Ado-Ekiti', location: 'Ado-Ekiti, Ekiti', budgetKobo: 20_000_000_000_000n, status: 'ONGOING', year: 2020, completionPct: 22, contractor: 'Ekiti State Investment Promotion Agency', sourceUrl: null },
+      { title: 'Ekiti State Farmers Support Scheme', description: 'Input support, insurance, and market linkage for 80,000 smallholder farmers', location: 'Ekiti State', budgetKobo: 1_200_000_000_000n, status: 'COMPLETED', year: 2021, completionPct: 100, contractor: 'FADAMA III', sourceUrl: null },
     ],
     votes: [],
     social: [
@@ -1237,67 +1252,67 @@ async function main() {
 
   const piaBill = await upsertBill(
     { title: 'Petroleum Industry Act, 2021', politicianId: akpabio.id },
-    { summary: 'Restructures the Nigerian petroleum industry, establishes NUPRC and NMDPRA regulators, creates the Nigerian National Petroleum Company Limited (NNPCL), and reforms royalties, taxes, and host community development obligations.', status: 'PASSED', chamber: 'SENATE', dateIntroduced: new Date('2020-09-30'), datePassed: new Date('2021-07-01'), coSponsors: 42, fullTextUrl: 'https://nass.gov.ng/bills/pia-2021-full', sourceUrl: 'https://nass.gov.ng/bills/pia-2021' },
+    { summary: 'Restructures the Nigerian petroleum industry, establishes NUPRC and NMDPRA regulators, creates the Nigerian National Petroleum Company Limited (NNPCL), and reforms royalties, taxes, and host community development obligations.', status: 'PASSED', chamber: 'SENATE', dateIntroduced: new Date('2020-09-30'), datePassed: new Date('2021-07-01'), coSponsors: 42, fullTextUrl: 'https://nass.gov.ng/bills/pia-2021-full', sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: piaBill.id } }))) {
     await prisma.billReading.createMany({ data: [
-      { billId: piaBill.id, readingNumber: 1, date: new Date('2020-09-30'), outcome: 'Passed First Reading', sourceUrl: 'https://nass.gov.ng/bills/pia-2021' },
+      { billId: piaBill.id, readingNumber: 1, date: new Date('2020-09-30'), outcome: 'Passed First Reading', sourceUrl: null },
       { billId: piaBill.id, readingNumber: 2, date: new Date('2021-03-18'), outcome: 'Passed Second Reading; referred to Committee on Petroleum', votesFor: 98, votesAgainst: 4, votesAbstain: 2 },
-      { billId: piaBill.id, readingNumber: 3, date: new Date('2021-07-01'), outcome: 'Passed Third Reading and enacted', votesFor: 87, votesAgainst: 12, votesAbstain: 3, sourceUrl: 'https://nass.gov.ng/bills/pia-2021' },
+      { billId: piaBill.id, readingNumber: 3, date: new Date('2021-07-01'), outcome: 'Passed Third Reading and enacted', votesFor: 87, votesAgainst: 12, votesAbstain: 3, sourceUrl: null },
     ]})
   }
 
   const electoralBill = await upsertBill(
     { title: 'Electoral Act (Amendment) Act, 2022', politicianId: ekweremadu.id },
-    { summary: 'Amended the Electoral Act to introduce electronic transmission of election results (IREV), updated party primaries, direct primaries option, and strengthened INEC independence.', status: 'PASSED', chamber: 'SENATE', dateIntroduced: new Date('2021-06-10'), datePassed: new Date('2022-02-24'), coSponsors: 38, fullTextUrl: 'https://nass.gov.ng/bills/electoral-act-2022-full', sourceUrl: 'https://nass.gov.ng/bills/electoral-act-2022' },
+    { summary: 'Amended the Electoral Act to introduce electronic transmission of election results (IREV), updated party primaries, direct primaries option, and strengthened INEC independence.', status: 'PASSED', chamber: 'SENATE', dateIntroduced: new Date('2021-06-10'), datePassed: new Date('2022-02-24'), coSponsors: 38, fullTextUrl: 'https://nass.gov.ng/bills/electoral-act-2022-full', sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: electoralBill.id } }))) {
     await prisma.billReading.createMany({ data: [
       { billId: electoralBill.id, readingNumber: 1, date: new Date('2021-06-10'), outcome: 'Passed First Reading' },
       { billId: electoralBill.id, readingNumber: 2, date: new Date('2021-09-28'), outcome: 'Passed Second Reading; electronic transmission clause hotly debated', votesFor: 52, votesAgainst: 28, votesAbstain: 8 },
-      { billId: electoralBill.id, readingNumber: 3, date: new Date('2022-02-24'), outcome: 'Passed Third Reading and signed by President', votesFor: 68, votesAgainst: 14, votesAbstain: 6, sourceUrl: 'https://nass.gov.ng/bills/electoral-act-2022' },
+      { billId: electoralBill.id, readingNumber: 3, date: new Date('2022-02-24'), outcome: 'Passed Third Reading and signed by President', votesFor: 68, votesAgainst: 14, votesAbstain: 6, sourceUrl: null },
     ]})
   }
 
   const nhiaBill = await upsertBill(
     { title: 'National Health Insurance Authority Act, 2022', politicianId: ndume.id },
-    { summary: 'Established the National Health Insurance Authority (NHIA) replacing the old NHIS, making health insurance mandatory for all Nigerians, streamlining benefit packages, and creating new enforcement powers.', status: 'PASSED', chamber: 'SENATE', dateIntroduced: new Date('2021-11-02'), datePassed: new Date('2022-05-17'), coSponsors: 31, fullTextUrl: 'https://nass.gov.ng/bills/nhia-2022-full', sourceUrl: 'https://nass.gov.ng/bills/nhia-2022' },
+    { summary: 'Established the National Health Insurance Authority (NHIA) replacing the old NHIS, making health insurance mandatory for all Nigerians, streamlining benefit packages, and creating new enforcement powers.', status: 'PASSED', chamber: 'SENATE', dateIntroduced: new Date('2021-11-02'), datePassed: new Date('2022-05-17'), coSponsors: 31, fullTextUrl: 'https://nass.gov.ng/bills/nhia-2022-full', sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: nhiaBill.id } }))) {
     await prisma.billReading.createMany({ data: [
       { billId: nhiaBill.id, readingNumber: 1, date: new Date('2021-11-02'), outcome: 'Passed First Reading' },
       { billId: nhiaBill.id, readingNumber: 2, date: new Date('2022-02-10'), outcome: 'Passed Second Reading', votesFor: 88, votesAgainst: 2, votesAbstain: 5 },
-      { billId: nhiaBill.id, readingNumber: 3, date: new Date('2022-05-17'), outcome: 'Passed and assented to by President Buhari', votesFor: 92, votesAgainst: 0, votesAbstain: 2, sourceUrl: 'https://nass.gov.ng/bills/nhia-2022' },
+      { billId: nhiaBill.id, readingNumber: 3, date: new Date('2022-05-17'), outcome: 'Passed and assented to by President Buhari', votesFor: 92, votesAgainst: 0, votesAbstain: 2, sourceUrl: null },
     ]})
   }
 
   const studentLoanBill = await upsertBill(
     { title: 'Student Loan (Access to Higher Education) Act, 2023', politicianId: abbas.id },
-    { summary: 'Established the Nigerian Education Loan Fund (NELFUND) to provide interest-free loans to Nigerian students for tuition and upkeep; repealed earlier education loan Act.', status: 'PASSED', chamber: 'HOUSE_OF_REPRESENTATIVES', dateIntroduced: new Date('2023-03-01'), datePassed: new Date('2023-06-12'), coSponsors: 55, fullTextUrl: 'https://nass.gov.ng/bills/studentloan-2023-full', sourceUrl: 'https://nass.gov.ng/bills/studentloan-2023' },
+    { summary: 'Established the Nigerian Education Loan Fund (NELFUND) to provide interest-free loans to Nigerian students for tuition and upkeep; repealed earlier education loan Act.', status: 'PASSED', chamber: 'HOUSE_OF_REPRESENTATIVES', dateIntroduced: new Date('2023-03-01'), datePassed: new Date('2023-06-12'), coSponsors: 55, fullTextUrl: 'https://nass.gov.ng/bills/studentloan-2023-full', sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: studentLoanBill.id } }))) {
     await prisma.billReading.createMany({ data: [
       { billId: studentLoanBill.id, readingNumber: 1, date: new Date('2023-03-01'), outcome: 'Passed First Reading in the House' },
       { billId: studentLoanBill.id, readingNumber: 2, date: new Date('2023-04-12'), outcome: 'Passed Second Reading', votesFor: 280, votesAgainst: 5, votesAbstain: 15 },
-      { billId: studentLoanBill.id, readingNumber: 3, date: new Date('2023-06-12'), outcome: 'Passed Third Reading; signed into law June 2023', votesFor: 312, votesAgainst: 2, votesAbstain: 6, sourceUrl: 'https://nass.gov.ng/bills/studentloan-2023' },
+      { billId: studentLoanBill.id, readingNumber: 3, date: new Date('2023-06-12'), outcome: 'Passed Third Reading; signed into law June 2023', votesFor: 312, votesAgainst: 2, votesAbstain: 6, sourceUrl: null },
     ]})
   }
 
   const socialMediaBill = await upsertBill(
     { title: 'Social Media (Prohibition of Falsehood) Bill, 2019', politicianId: remiTinubu.id },
-    { summary: 'Sought to criminalise sharing of "false statements" on social media with penalties of up to ₦300,000 or 3 years imprisonment. Widely condemned by civil society as anti-free speech; rejected at Third Reading.', status: 'REJECTED', chamber: 'SENATE', dateIntroduced: new Date('2019-10-08'), coSponsors: 6, sourceUrl: 'https://nass.gov.ng/bills/socialmedia-2019' },
+    { summary: 'Sought to criminalise sharing of "false statements" on social media with penalties of up to ₦300,000 or 3 years imprisonment. Widely condemned by civil society as anti-free speech; rejected at Third Reading.', status: 'REJECTED', chamber: 'SENATE', dateIntroduced: new Date('2019-10-08'), coSponsors: 6, sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: socialMediaBill.id } }))) {
     await prisma.billReading.createMany({ data: [
       { billId: socialMediaBill.id, readingNumber: 1, date: new Date('2019-10-08'), outcome: 'Passed First Reading' },
       { billId: socialMediaBill.id, readingNumber: 2, date: new Date('2019-11-05'), outcome: 'Narrowly passed Second Reading amid protests; referred to committee', votesFor: 45, votesAgainst: 38, votesAbstain: 9 },
-      { billId: socialMediaBill.id, readingNumber: 3, date: new Date('2020-01-28'), outcome: 'Rejected at Third Reading following mass public opposition', votesFor: 24, votesAgainst: 58, votesAbstain: 14, sourceUrl: 'https://nass.gov.ng/bills/socialmedia-2019' },
+      { billId: socialMediaBill.id, readingNumber: 3, date: new Date('2020-01-28'), outcome: 'Rejected at Third Reading following mass public opposition', votesFor: 24, votesAgainst: 58, votesAbstain: 14, sourceUrl: null },
     ]})
   }
 
   const genderBill = await upsertBill(
     { title: 'Gender and Equal Opportunities Bill', politicianId: remiTinubu.id },
-    { summary: 'Seeks to eliminate discrimination against women in all spheres of Nigerian public and private life, implement CEDAW obligations, and establish an Equal Opportunities Commission.', status: 'SECOND_READING', chamber: 'SENATE', dateIntroduced: new Date('2021-03-08'), coSponsors: 18, sourceUrl: 'https://nass.gov.ng/bills/gender-bill' },
+    { summary: 'Seeks to eliminate discrimination against women in all spheres of Nigerian public and private life, implement CEDAW obligations, and establish an Equal Opportunities Commission.', status: 'SECOND_READING', chamber: 'SENATE', dateIntroduced: new Date('2021-03-08'), coSponsors: 18, sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: genderBill.id } }))) {
     await prisma.billReading.createMany({ data: [
@@ -1308,7 +1323,7 @@ async function main() {
 
   const antiCorruptionBill = await upsertBill(
     { title: 'Anti-Corruption and Financial Crimes Commission Bill, 2024', politicianId: akpabio.id },
-    { summary: 'Proposes to merge EFCC and ICPC into a single Anti-Corruption and Financial Crimes Commission; clarifies jurisdiction, asset recovery procedures, and witness protection provisions.', status: 'FIRST_READING', chamber: 'SENATE', dateIntroduced: new Date('2024-02-06'), coSponsors: 8, sourceUrl: 'https://nass.gov.ng/bills/anti-corruption-2024' },
+    { summary: 'Proposes to merge EFCC and ICPC into a single Anti-Corruption and Financial Crimes Commission; clarifies jurisdiction, asset recovery procedures, and witness protection provisions.', status: 'FIRST_READING', chamber: 'SENATE', dateIntroduced: new Date('2024-02-06'), coSponsors: 8, sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: antiCorruptionBill.id } }))) {
     await prisma.billReading.create({ data: { billId: antiCorruptionBill.id, readingNumber: 1, date: new Date('2024-02-06'), outcome: 'Passed First Reading; referred to Committee' } })
@@ -1316,31 +1331,31 @@ async function main() {
 
   const lgAutonomyBill = await upsertBill(
     { title: 'Local Government Autonomy (Constitution Amendment) Bill, 2024', politicianId: ndume.id },
-    { summary: 'Amends the 1999 Constitution to grant financial and administrative autonomy to the 774 local government areas, abolish state joint accounts, and mandate direct allocation from FAAC to LGAs.', status: 'THIRD_READING', chamber: 'SENATE', dateIntroduced: new Date('2023-11-14'), coSponsors: 62, sourceUrl: 'https://nass.gov.ng/bills/lg-autonomy-2024' },
+    { summary: 'Amends the 1999 Constitution to grant financial and administrative autonomy to the 774 local government areas, abolish state joint accounts, and mandate direct allocation from FAAC to LGAs.', status: 'THIRD_READING', chamber: 'SENATE', dateIntroduced: new Date('2023-11-14'), coSponsors: 62, sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: lgAutonomyBill.id } }))) {
     await prisma.billReading.createMany({ data: [
       { billId: lgAutonomyBill.id, readingNumber: 1, date: new Date('2023-11-14'), outcome: 'Passed First Reading' },
       { billId: lgAutonomyBill.id, readingNumber: 2, date: new Date('2024-01-30'), outcome: 'Passed Second Reading; wide support from both chambers', votesFor: 88, votesAgainst: 6, votesAbstain: 4 },
-      { billId: lgAutonomyBill.id, readingNumber: 3, date: new Date('2024-03-26'), outcome: 'Passed Third Reading; Supreme Court earlier ordered implementation', votesFor: 94, votesAgainst: 0, votesAbstain: 2, sourceUrl: 'https://nass.gov.ng/bills/lg-autonomy-2024' },
+      { billId: lgAutonomyBill.id, readingNumber: 3, date: new Date('2024-03-26'), outcome: 'Passed Third Reading; Supreme Court earlier ordered implementation', votesFor: 94, votesAgainst: 0, votesAbstain: 2, sourceUrl: null },
     ]})
   }
 
   const minWageBill = await upsertBill(
     { title: 'Minimum Wage (Amendment) Act, 2024', politicianId: adeola.id },
-    { summary: 'Raised the national minimum wage from ₦30,000 to ₦70,000 per month following tripartite negotiations between government, employers, and NLC/TUC trade unions.', status: 'PASSED', chamber: 'SENATE', dateIntroduced: new Date('2024-06-18'), datePassed: new Date('2024-07-28'), coSponsors: 40, fullTextUrl: 'https://nass.gov.ng/bills/minwage-2024-full', sourceUrl: 'https://nass.gov.ng/bills/minwage-2024' },
+    { summary: 'Raised the national minimum wage from ₦30,000 to ₦70,000 per month following tripartite negotiations between government, employers, and NLC/TUC trade unions.', status: 'PASSED', chamber: 'SENATE', dateIntroduced: new Date('2024-06-18'), datePassed: new Date('2024-07-28'), coSponsors: 40, fullTextUrl: 'https://nass.gov.ng/bills/minwage-2024-full', sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: minWageBill.id } }))) {
     await prisma.billReading.createMany({ data: [
       { billId: minWageBill.id, readingNumber: 1, date: new Date('2024-06-18'), outcome: 'Passed First Reading' },
       { billId: minWageBill.id, readingNumber: 2, date: new Date('2024-07-02'), outcome: 'Passed Second Reading amid NLC strike threat', votesFor: 95, votesAgainst: 1, votesAbstain: 1 },
-      { billId: minWageBill.id, readingNumber: 3, date: new Date('2024-07-11'), outcome: 'Passed unanimously; signed by President Tinubu July 28', votesFor: 96, votesAgainst: 0, votesAbstain: 0, sourceUrl: 'https://nass.gov.ng/bills/minwage-2024' },
+      { billId: minWageBill.id, readingNumber: 3, date: new Date('2024-07-11'), outcome: 'Passed unanimously; signed by President Tinubu July 28', votesFor: 96, votesAgainst: 0, votesAbstain: 0, sourceUrl: null },
     ]})
   }
 
   const taxReformBill = await upsertBill(
     { title: 'Tax Reform Bill (Joint Revenue Board Establishment) Act, 2024', politicianId: abbas.id },
-    { summary: 'One of four Tax Reform Bills 2024; establishes a Joint Revenue Board of Nigeria to coordinate federal, state, and LGA tax administration and reduce multiple taxation.', status: 'THIRD_READING', chamber: 'HOUSE_OF_REPRESENTATIVES', dateIntroduced: new Date('2024-09-03'), coSponsors: 88, sourceUrl: 'https://nass.gov.ng/bills/tax-reform-2024' },
+    { summary: 'One of four Tax Reform Bills 2024; establishes a Joint Revenue Board of Nigeria to coordinate federal, state, and LGA tax administration and reduce multiple taxation.', status: 'THIRD_READING', chamber: 'HOUSE_OF_REPRESENTATIVES', dateIntroduced: new Date('2024-09-03'), coSponsors: 88, sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: taxReformBill.id } }))) {
     await prisma.billReading.createMany({ data: [
@@ -1351,19 +1366,19 @@ async function main() {
 
   const seniorCitizensBill = await upsertBill(
     { title: 'National Senior Citizens Centre Act, 2022', politicianId: nedNwoko.id },
-    { summary: 'Established the National Senior Citizens Centre to develop policies and programmes for the welfare, social security, and dignified ageing of Nigerians aged 60 and above.', status: 'PASSED', chamber: 'SENATE', dateIntroduced: new Date('2021-09-14'), datePassed: new Date('2022-08-30'), coSponsors: 22, fullTextUrl: 'https://nass.gov.ng/bills/seniorcitizens-2022-full', sourceUrl: 'https://nass.gov.ng/bills/seniorcitizens-2022' },
+    { summary: 'Established the National Senior Citizens Centre to develop policies and programmes for the welfare, social security, and dignified ageing of Nigerians aged 60 and above.', status: 'PASSED', chamber: 'SENATE', dateIntroduced: new Date('2021-09-14'), datePassed: new Date('2022-08-30'), coSponsors: 22, fullTextUrl: 'https://nass.gov.ng/bills/seniorcitizens-2022-full', sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: seniorCitizensBill.id } }))) {
     await prisma.billReading.createMany({ data: [
       { billId: seniorCitizensBill.id, readingNumber: 1, date: new Date('2021-09-14'), outcome: 'Passed First Reading' },
       { billId: seniorCitizensBill.id, readingNumber: 2, date: new Date('2022-04-26'), outcome: 'Passed Second Reading', votesFor: 90, votesAgainst: 0, votesAbstain: 4 },
-      { billId: seniorCitizensBill.id, readingNumber: 3, date: new Date('2022-08-30'), outcome: 'Passed and signed into law by President Buhari', votesFor: 92, votesAgainst: 0, votesAbstain: 2, sourceUrl: 'https://nass.gov.ng/bills/seniorcitizens-2022' },
+      { billId: seniorCitizensBill.id, readingNumber: 3, date: new Date('2022-08-30'), outcome: 'Passed and signed into law by President Buhari', votesFor: 92, votesAgainst: 0, votesAbstain: 2, sourceUrl: null },
     ]})
   }
 
   const disabilityBill = await upsertBill(
     { title: 'Disability Rights Commission Bill, 2020', politicianId: ekweremadu.id },
-    { summary: 'Proposes to establish a National Disability Rights Commission to enforce the Discrimination Against Persons with Disabilities (Prohibition) Act 2018 and coordinate disability rights in Nigeria.', status: 'SECOND_READING', chamber: 'SENATE', dateIntroduced: new Date('2020-07-14'), coSponsors: 14, sourceUrl: 'https://nass.gov.ng/bills/disability-rights-2020' },
+    { summary: 'Proposes to establish a National Disability Rights Commission to enforce the Discrimination Against Persons with Disabilities (Prohibition) Act 2018 and coordinate disability rights in Nigeria.', status: 'SECOND_READING', chamber: 'SENATE', dateIntroduced: new Date('2020-07-14'), coSponsors: 14, sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: disabilityBill.id } }))) {
     await prisma.billReading.createMany({ data: [
@@ -1374,7 +1389,7 @@ async function main() {
 
   const broadcastingBill = await upsertBill(
     { title: 'Broadcasting Commission Amendment Bill, 2024', politicianId: melaye.id },
-    { summary: 'Proposes amendments to the National Broadcasting Commission Act to extend NBC licensing powers to online streaming platforms and social media broadcasters with over 100,000 followers.', status: 'FIRST_READING', chamber: 'SENATE', dateIntroduced: new Date('2024-03-05'), coSponsors: 5, sourceUrl: 'https://nass.gov.ng/bills/broadcasting-2024' },
+    { summary: 'Proposes amendments to the National Broadcasting Commission Act to extend NBC licensing powers to online streaming platforms and social media broadcasters with over 100,000 followers.', status: 'FIRST_READING', chamber: 'SENATE', dateIntroduced: new Date('2024-03-05'), coSponsors: 5, sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: broadcastingBill.id } }))) {
     await prisma.billReading.create({ data: { billId: broadcastingBill.id, readingNumber: 1, date: new Date('2024-03-05'), outcome: 'Passed First Reading; attracted civil society criticism' } })
@@ -1382,25 +1397,25 @@ async function main() {
 
   const policeReformBill = await upsertBill(
     { title: 'Police Reform Bill, 2024', politicianId: ndume.id },
-    { summary: 'Seeks to restructure the Nigeria Police Force through decentralisation, establish state police, improve welfare conditions, create an independent police complaints commission, and mandate body cameras.', status: 'THIRD_READING', chamber: 'SENATE', dateIntroduced: new Date('2024-01-23'), coSponsors: 58, sourceUrl: 'https://nass.gov.ng/bills/police-reform-2024' },
+    { summary: 'Seeks to restructure the Nigeria Police Force through decentralisation, establish state police, improve welfare conditions, create an independent police complaints commission, and mandate body cameras.', status: 'THIRD_READING', chamber: 'SENATE', dateIntroduced: new Date('2024-01-23'), coSponsors: 58, sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: policeReformBill.id } }))) {
     await prisma.billReading.createMany({ data: [
       { billId: policeReformBill.id, readingNumber: 1, date: new Date('2024-01-23'), outcome: 'Passed First Reading' },
       { billId: policeReformBill.id, readingNumber: 2, date: new Date('2024-04-09'), outcome: 'Second Reading; state police clause contentious among northern senators', votesFor: 64, votesAgainst: 24, votesAbstain: 10 },
-      { billId: policeReformBill.id, readingNumber: 3, date: new Date('2024-06-12'), outcome: 'Third Reading passed; awaiting presidential assent', votesFor: 78, votesAgainst: 14, votesAbstain: 6, sourceUrl: 'https://nass.gov.ng/bills/police-reform-2024' },
+      { billId: policeReformBill.id, readingNumber: 3, date: new Date('2024-06-12'), outcome: 'Third Reading passed; awaiting presidential assent', votesFor: 78, votesAgainst: 14, votesAbstain: 6, sourceUrl: null },
     ]})
   }
 
   const camaBill = await upsertBill(
     { title: 'Companies and Allied Matters Act (Amendment), 2020', politicianId: kalu.id },
-    { summary: 'Landmark amendment to CAMA 2004; introduced small company simplified governance, reduced filing burdens, allowed single-member companies, modernised insolvency and merger frameworks, and enabled digital AGMs.', status: 'PASSED', chamber: 'SENATE', dateIntroduced: new Date('2020-03-12'), datePassed: new Date('2020-08-07'), coSponsors: 28, fullTextUrl: 'https://nass.gov.ng/bills/cama-2020-full', sourceUrl: 'https://nass.gov.ng/bills/cama-2020' },
+    { summary: 'Landmark amendment to CAMA 2004; introduced small company simplified governance, reduced filing burdens, allowed single-member companies, modernised insolvency and merger frameworks, and enabled digital AGMs.', status: 'PASSED', chamber: 'SENATE', dateIntroduced: new Date('2020-03-12'), datePassed: new Date('2020-08-07'), coSponsors: 28, fullTextUrl: 'https://nass.gov.ng/bills/cama-2020-full', sourceUrl: null },
   )
   if (!(await prisma.billReading.count({ where: { billId: camaBill.id } }))) {
     await prisma.billReading.createMany({ data: [
       { billId: camaBill.id, readingNumber: 1, date: new Date('2020-03-12'), outcome: 'Passed First Reading' },
       { billId: camaBill.id, readingNumber: 2, date: new Date('2020-06-09'), outcome: 'Second Reading passed; welcomed by business community', votesFor: 94, votesAgainst: 0, votesAbstain: 2 },
-      { billId: camaBill.id, readingNumber: 3, date: new Date('2020-08-06'), outcome: 'Passed Third Reading; signed by President Buhari August 2020', votesFor: 96, votesAgainst: 0, votesAbstain: 0, sourceUrl: 'https://nass.gov.ng/bills/cama-2020' },
+      { billId: camaBill.id, readingNumber: 3, date: new Date('2020-08-06'), outcome: 'Passed Third Reading; signed by President Buhari August 2020', votesFor: 96, votesAgainst: 0, votesAbstain: 0, sourceUrl: null },
     ]})
   }
   console.log('✅  Sponsored bills + readings')

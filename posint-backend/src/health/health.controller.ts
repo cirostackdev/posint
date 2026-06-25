@@ -1,152 +1,134 @@
-import { Controller, Get, Logger } from '@nestjs/common'
+import { Controller, Get } from '@nestjs/common'
 import { ApiTags, ApiOperation } from '@nestjs/swagger'
-import { Public } from '../common/decorators/public.decorator'
 import { PrismaService } from '../prisma/prisma.service'
 import { RedisService } from '../redis/redis.service'
-import { PusherService } from '../pusher/pusher.service'
-import { PipelineService } from '../pipeline/pipeline.service'
+import { Public } from '../common/decorators/public.decorator'
+
+interface HealthStatus {
+  status: 'ok' | 'degraded' | 'down'
+  database: 'connected' | 'disconnected'
+  redis: 'connected' | 'disconnected'
+  uptime: number
+  timestamp: string
+  version: string
+}
+
+interface DetailedHealthStatus extends HealthStatus {
+  dataFreshness: {
+    politicians: string | null
+    bills: string | null
+    cases: string | null
+    social: string | null
+  }
+  pipeline: {
+    lastRun: string | null
+    status: 'healthy' | 'stale' | 'offline'
+    queuesActive: number
+  }
+}
 
 @ApiTags('Health')
-@Controller('health')
+@Controller({ path: 'health', version: '1' })
 export class HealthController {
-  private readonly logger = new Logger(HealthController.name)
-
   constructor(
     private prisma: PrismaService,
     private redis: RedisService,
-    private pusher: PusherService,
-    private pipeline: PipelineService,
   ) {}
 
   @Get()
   @Public()
-  @ApiOperation({ summary: 'Enhanced health check with service monitoring and metrics' })
-  async getHealth() {
-    const startTime = Date.now();
-    const health: any = {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      services: {},
-      metrics: this.getSystemMetrics(),
-    }
+  @ApiOperation({ summary: 'Basic health check' })
+  async getHealth(): Promise<HealthStatus> {
+    const [dbStatus, redisStatus] = await Promise.allSettled([
+      this.checkDatabase(),
+      this.checkRedis(),
+    ])
 
-    // Database check
-    try {
-      const dbStart = Date.now()
-      await this.prisma.$queryRaw`SELECT 1`
-      const dbResponseTime = Date.now() - dbStart
-      health.services['database'] = {
-        status: 'ok',
-        responseTime: dbResponseTime,
-      }
-    } catch (error) {
-      health.services['database'] = {
-        status: 'down',
-        error: error instanceof Error ? error.message : String(error),
-      }
-      health.status = 'degraded'
-      await this.alertService('database', error)
-    }
+    const dbConnected = dbStatus.status === 'fulfilled' && dbStatus.value
+    const redisConnected = redisStatus.status === 'fulfilled' && redisStatus.value
 
-    // Redis check
-    try {
-      const redisStart = Date.now()
-      // Attempt a simple operation to check connectivity
-      const testKey = `health-check-${Date.now()}`
-      await this.redis.set(testKey, '1', 1)
-      const redisResponseTime = Date.now() - redisStart
-      health.services['redis'] = {
-        status: 'ok',
-        responseTime: redisResponseTime,
-      }
-    } catch (error) {
-      health.services['redis'] = {
-        status: 'down',
-        error: error instanceof Error ? error.message : String(error),
-      }
-      health.status = 'degraded'
-      await this.alertService('redis', error)
-    }
+    const overallStatus = dbConnected && redisConnected ? 'ok'
+      : dbConnected || redisConnected ? 'degraded' : 'down'
 
-    // Pipeline queues check
-    try {
-      const queueStatus = await this.pipeline.getJobsStatus()
-      let totalFailed = 0
-      let totalActive = 0
-      let totalCompleted = 0
-
-      // Sum across all queues
-      Object.values(queueStatus).forEach((queue: any) => {
-        totalActive += queue.active || 0
-        totalCompleted += queue.completed || 0
-        totalFailed += queue.failed || 0
-      })
-
-      health.services['pipeline'] = {
-        status: totalFailed > 100 ? 'degraded' : 'ok',
-        activeJobs: totalActive,
-        completedJobs: totalCompleted,
-        failedJobs: totalFailed,
-        queues: queueStatus,
-      }
-
-      if (totalFailed > 100) {
-        health.status = 'degraded'
-        await this.alertService('pipeline', `${totalFailed} failed jobs detected`)
-      }
-    } catch (error) {
-      health.services['pipeline'] = {
-        status: 'down',
-        error: error instanceof Error ? error.message : String(error),
-      }
-      health.status = 'degraded'
-      await this.alertService('pipeline', error)
-    }
-
-    // Pusher connectivity check
-    try {
-      // Pusher is optional and doesn't expose a ping method in the service
-      // We verify it's configured by checking if trigger method exists
-      health.services['pusher'] = {
-        status: this.pusher ? 'ok' : 'disabled',
-      }
-    } catch (error) {
-      health.services['pusher'] = {
-        status: 'down',
-        error: error instanceof Error ? error.message : String(error),
-      }
-    }
-
-    const totalTime = Date.now() - startTime
-    health.checkDuration = totalTime
-
-    return health
-  }
-
-  private getSystemMetrics() {
-    const memUsage = process.memoryUsage()
     return {
-      memory: {
-        heapUsed: Math.round((memUsage.heapUsed / 1024 / 1024) * 100) / 100,
-        heapTotal: Math.round((memUsage.heapTotal / 1024 / 1024) * 100) / 100,
-        rss: Math.round((memUsage.rss / 1024 / 1024) * 100) / 100,
-        external: Math.round((memUsage.external / 1024 / 1024) * 100) / 100,
-      },
-      cpu: process.cpuUsage(),
+      status: overallStatus,
+      database: dbConnected ? 'connected' : 'disconnected',
+      redis: redisConnected ? 'connected' : 'disconnected',
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+      version: process.env.npm_package_version ?? '1.0.0',
     }
   }
 
-  private async alertService(service: string, error: unknown) {
+  @Get('detailed')
+  @Public()
+  @ApiOperation({ summary: 'Detailed health with data freshness and pipeline status' })
+  async getDetailedHealth(): Promise<DetailedHealthStatus> {
+    const basic = await this.getHealth()
+    const [freshness, pipeline] = await Promise.allSettled([
+      this.checkDataFreshness(),
+      this.checkPipelineHealth(),
+    ])
+
+    return {
+      ...basic,
+      dataFreshness: freshness.status === 'fulfilled' ? freshness.value : { politicians: null, bills: null, cases: null, social: null },
+      pipeline: pipeline.status === 'fulfilled' ? pipeline.value : { lastRun: null, status: 'offline', queuesActive: 0 },
+    }
+  }
+
+  private async checkDatabase(): Promise<boolean> {
     try {
-      await this.pusher.triggerAdmin('service-health-alert', {
-        service,
-        timestamp: new Date().toISOString(),
-        message: error instanceof Error ? error.message : String(error),
-        severity: 'high',
-      })
-    } catch (e) {
-      this.logger.error(`[Health] Alert send failed: ${e instanceof Error ? e.message : String(e)}`)
+      await this.prisma.$queryRaw`SELECT 1`
+      return true
+    } catch { return false }
+  }
+
+  private async checkRedis(): Promise<boolean> {
+    try {
+      const testKey = `health-check-${Date.now()}`
+      await this.redis.set(testKey, '1', 5)
+      const result = await this.redis.get(testKey)
+      return result !== null
+    } catch { return false }
+  }
+
+  private async checkDataFreshness(): Promise<DetailedHealthStatus['dataFreshness']> {
+    try {
+      const [politician, bill, corruption, social] = await Promise.allSettled([
+        this.prisma.politician.findFirst({ orderBy: { updatedAt: 'desc' }, select: { updatedAt: true } }),
+        this.prisma.sponsoredBill.findFirst({ orderBy: { updatedAt: 'desc' }, select: { updatedAt: true } }),
+        this.prisma.corruptionCase.findFirst({ orderBy: { updatedAt: 'desc' }, select: { updatedAt: true } }),
+        this.prisma.socialMention.findFirst({ orderBy: { publishedAt: 'desc' }, select: { publishedAt: true } }),
+      ])
+      return {
+        politicians: politician.status === 'fulfilled' ? politician.value?.updatedAt?.toISOString() ?? null : null,
+        bills: bill.status === 'fulfilled' ? bill.value?.updatedAt?.toISOString() ?? null : null,
+        cases: corruption.status === 'fulfilled' ? corruption.value?.updatedAt?.toISOString() ?? null : null,
+        social: social.status === 'fulfilled' ? social.value?.publishedAt?.toISOString() ?? null : null,
+      }
+    } catch {
+      return { politicians: null, bills: null, cases: null, social: null }
+    }
+  }
+
+  private async checkPipelineHealth(): Promise<DetailedHealthStatus['pipeline']> {
+    try {
+      const [lastRun, activeQueues] = await Promise.all([
+        this.redis.get<string>('pipeline:last-run'),
+        this.redis.get<string>('pipeline:active-queues'),
+      ])
+      const lastRunDate = lastRun ? new Date(lastRun) : null
+      const hoursSinceLastRun = lastRunDate
+        ? (Date.now() - lastRunDate.getTime()) / (1000 * 60 * 60)
+        : Infinity
+      return {
+        lastRun: lastRun ?? null,
+        status: hoursSinceLastRun < 6 ? 'healthy' : hoursSinceLastRun < 24 ? 'stale' : 'offline',
+        queuesActive: Number(activeQueues) || 0,
+      }
+    } catch {
+      return { lastRun: null, status: 'offline', queuesActive: 0 }
     }
   }
 }

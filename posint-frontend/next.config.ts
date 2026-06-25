@@ -1,6 +1,7 @@
 import type { NextConfig } from "next"
 import bundleAnalyzer from "@next/bundle-analyzer"
 import withPWAInit from "@ducanh2912/next-pwa"
+import { withSentryConfig } from "@sentry/nextjs"
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -9,11 +10,10 @@ const withBundleAnalyzer = bundleAnalyzer({
 const withPWA = withPWAInit({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
-  register: false, // We register manually for update control
-  skipWaiting: true,
+  register: false,
+  skipWaiting: false,
   runtimeCaching: [
     {
-      // App shell — stale-while-revalidate
       urlPattern: /^https?:\/\/.*\/_next\/static\/.*/i,
       handler: "StaleWhileRevalidate",
       options: {
@@ -22,7 +22,6 @@ const withPWA = withPWAInit({
       },
     },
     {
-      // API responses — network-first with offline fallback
       urlPattern: /^https?:\/\/.*\/api\/v1\/.*/i,
       handler: "NetworkFirst",
       options: {
@@ -31,12 +30,11 @@ const withPWA = withPWAInit({
         networkTimeoutSeconds: 10,
         backgroundSync: {
           name: "api-queue",
-          options: { maxRetentionTime: 60 * 24 }, // 24 hours
+          options: { maxRetentionTime: 60 * 24 },
         },
       },
     },
     {
-      // Images — cache-first
       urlPattern: /^https?:\/\/.*\.(png|jpg|jpeg|webp|avif|svg|gif|ico)$/i,
       handler: "CacheFirst",
       options: {
@@ -45,7 +43,6 @@ const withPWA = withPWAInit({
       },
     },
     {
-      // Google Fonts — cache-first
       urlPattern: /^https?:\/\/fonts\.googleapis\.com\/.*/i,
       handler: "CacheFirst",
       options: {
@@ -54,7 +51,7 @@ const withPWA = withPWAInit({
       },
     },
   ],
-})
+} as any)
 
 const nextConfig: NextConfig = {
   images: {
@@ -73,41 +70,18 @@ const nextConfig: NextConfig = {
   headers: async () => [
     {
       source: "/_next/static/:path*",
-      headers: [
-        {
-          key: "Cache-Control",
-          value: "public, max-age=31536000, immutable",
-        },
-      ],
-    },
-    {
-      source: "/public/:path*",
-      headers: [
-        {
-          key: "Cache-Control",
-          value: "public, max-age=31536000, immutable",
-        },
-      ],
-    },
-    {
-      source: "/_next/image/:path*",
-      headers: [
-        {
-          key: "Cache-Control",
-          value: "public, max-age=31536000, immutable",
-        },
-      ],
-    },
-    {
-      source: "/fonts/:path*",
-      headers: [
-        {
-          key: "Cache-Control",
-          value: "public, max-age=31536000, immutable",
-        },
-      ],
+      headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
     },
   ],
 }
 
-export default withBundleAnalyzer(withPWA(nextConfig))
+const config = withBundleAnalyzer(withPWA(nextConfig))
+export default process.env.NODE_ENV === "production"
+  ? withSentryConfig(config, {
+      silent: !process.env.CI,
+      widenClientFileUpload: true,
+      tunnelRoute: "/monitoring",
+      hideSourceMaps: true,
+      disableLogger: true,
+    })
+  : config

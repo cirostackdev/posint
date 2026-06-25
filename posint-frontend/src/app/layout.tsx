@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import { Inter, Space_Grotesk } from "next/font/google"
 import "./globals.css"
 import { Providers } from "./providers"
+import { OfflineBanner } from "@/shared/components/shared/OfflineBanner"
+import { ServiceWorkerInit } from "@/app/ServiceWorkerInit"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,6 +38,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
+        <ServiceWorkerInit />
+        <OfflineBanner />
         <Providers>{children}</Providers>
       </body>
     </html>
