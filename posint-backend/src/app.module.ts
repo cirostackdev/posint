@@ -31,6 +31,8 @@ import { HealthModule } from './health/health.module'
 import { WebhooksModule } from './webhooks/webhooks.module'
 import { ProvenanceModule } from './provenance/provenance.module'
 import { AnalyticsModule } from './analytics/analytics.module'
+import { ApiKeysModule } from './api-keys/api-keys.module'
+import { CorrectionsModule } from './corrections/corrections.module'
 
 import { AlertingMiddleware } from './common/middleware/alerting.middleware'
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard'
@@ -80,6 +82,8 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor'
     WebhooksModule,
     ProvenanceModule,
     AnalyticsModule,
+    ApiKeysModule,
+    CorrectionsModule,
   ],
   providers: [
     // Global guards
